@@ -1,0 +1,106 @@
+:root {
+	--bg: #fafafa;
+	--surface: #ffffff;
+	--text: #1a1a1a;
+	--muted: #6b6b6b;
+	--primary: #0a6b64;
+	--accent: #c4443e;
+	--border: #e4e4e4;
+	--border-strong: #c9c9c9;
+
+	--radius: 0.625rem;
+	--page-width: 46rem;
+	--page-padding: 1.5rem;
+
+	--font-heading: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+	--font-body: "Lato", system-ui, -apple-system, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+html {
+	scroll-behavior: smooth;
+	scroll-padding-top: 4rem;
+}
+
+body {
+	background: var(--bg);
+	color: var(--text);
+	font-family: var(--font-body);
+	font-size: 1rem;
+	line-height: 1.6;
+	-webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+	font-family: var(--font-heading);
+	font-weight: 600;
+	line-height: 1.25;
+}
+
+a {
+	color: var(--primary);
+}
+
+a:hover {
+	color: var(--accent);
+}
+
+ul,
+ol {
+	list-style-position: inside;
+}
+
+.section {
+	padding: 2.5rem 0;
+	border-bottom: 1px solid var(--border);
+}
+
+.section:last-child {
+	border-bottom: 0;
+}
+
+.section h2 {
+	font-size: 1.6rem;
+	margin-bottom: 1.25rem;
+}
+
+.section--intro {
+	border-bottom: 1px solid var(--border);
+}
+
+button:focus-visible,
+a:focus-visible {
+	outline: 2px solid var(--primary);
+	outline-offset: 2px;
+}
+
+@media print {
+	:root {
+		--page-width: 100%;
+	}
+
+	body {
+		background: #fff;
+		font-size: 10.5pt;
+	}
+
+	/* project details are toggled with v-show — force them open on paper */
+	[id^="details-"] {
+		display: block !important;
+	}
+
+	.section {
+		break-inside: avoid;
+		padding: 1.25rem 0;
+	}
+}
