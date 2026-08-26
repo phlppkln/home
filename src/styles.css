@@ -1,19 +1,45 @@
+/*
+ * Design tokens — Scandinavian / Japandi.
+ *
+ * Warm paper ground, ink-brown text, hairline rules, and a single muted
+ * sage accent. Colour is used sparingly: the palette is four neutrals plus
+ * one accent, so hierarchy comes from weight, scale and space instead.
+ */
 :root {
-	--bg: #fafafa;
-	--surface: #ffffff;
-	--text: #1a1a1a;
-	--muted: #6b6b6b;
-	--primary: #0a6b64;
-	--accent: #c4443e;
-	--border: #e4e4e4;
-	--border-strong: #c9c9c9;
+	/* Ground */
+	--paper: #f5f3ee;
+	--surface: #fbfaf6;
+	--surface-sunken: #f0ede5;
 
-	--radius: 0.625rem;
-	--page-width: 46rem;
-	--page-padding: 1.5rem;
+	/* Ink */
+	--text: #22201c;
+	--muted: #6b655b;
+	--faint: #736c5e;
+
+	/* Structure */
+	--line: #e2ddd2;
+	--line-strong: #cec7b8;
+
+	/* The one accent — a desaturated pine, kin to the portfolio teal */
+	--accent: #3f5c55;
+	--accent-hover: #2d443e;
+	/* Warm clay, reserved for the hero mark and nothing else */
+	--clay: #b0754f;
+
+	--radius: 0.25rem;
+	--radius-lg: 0.5rem;
+
+	--page-width: 48rem;
+	--page-padding: 1.75rem;
 
 	--font-heading: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
 	--font-body: "Lato", system-ui, -apple-system, sans-serif;
+
+	/* Motion — one curve and three durations, used everywhere */
+	--ease: cubic-bezier(0.22, 0.61, 0.24, 1);
+	--fast: 160ms;
+	--base: 260ms;
+	--slow: 520ms;
 }
 
 *,
@@ -26,16 +52,20 @@
 
 html {
 	scroll-behavior: smooth;
-	scroll-padding-top: 4rem;
+	scroll-padding-top: 5rem;
+	-webkit-text-size-adjust: 100%;
 }
 
 body {
-	background: var(--bg);
+	background: var(--paper);
 	color: var(--text);
 	font-family: var(--font-body);
 	font-size: 1rem;
-	line-height: 1.6;
+	font-weight: 400;
+	line-height: 1.75;
+	letter-spacing: 0.005em;
 	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 h1,
@@ -43,16 +73,20 @@ h2,
 h3,
 h4 {
 	font-family: var(--font-heading);
-	font-weight: 600;
-	line-height: 1.25;
+	font-weight: 500;
+	line-height: 1.3;
+	letter-spacing: -0.012em;
 }
 
 a {
-	color: var(--primary);
+	color: var(--accent);
+	text-decoration-thickness: 1px;
+	text-underline-offset: 0.22em;
+	transition: color var(--fast) var(--ease);
 }
 
 a:hover {
-	color: var(--accent);
+	color: var(--accent-hover);
 }
 
 ul,
@@ -60,43 +94,120 @@ ol {
 	list-style-position: inside;
 }
 
+/* ── Layout rhythm ─────────────────────────────────────────────── */
+
 .section {
-	padding: 2.5rem 0;
-	border-bottom: 1px solid var(--border);
+	padding: 4rem 0;
+	border-bottom: 1px solid var(--line);
 }
 
 .section:last-child {
 	border-bottom: 0;
 }
 
+/*
+ * Section headings sit in the left margin as small caps rather than as
+ * large type — the content carries the page, the label just orients you.
+ */
 .section h2 {
-	font-size: 1.6rem;
-	margin-bottom: 1.25rem;
+	display: flex;
+	align-items: center;
+	gap: 0.55rem;
+	font-size: 0.75rem;
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: 0.16em;
+	color: var(--faint);
+	margin-bottom: 2rem;
 }
 
-.section--intro {
-	border-bottom: 1px solid var(--border);
+/* ── Utilities ─────────────────────────────────────────────────── */
+
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
 }
 
-button:focus-visible,
-a:focus-visible {
-	outline: 2px solid var(--primary);
-	outline-offset: 2px;
+/*
+ * Scroll reveal. Elements start slightly low and transparent; the
+ * `v-reveal` directive flips the attribute to `in` when they enter the
+ * viewport. `--reveal-delay` staggers siblings.
+ *
+ * Deliberately an attribute rather than a class — see reveal.ts.
+ */
+[data-reveal] {
+	opacity: 0;
+	transform: translateY(10px);
+	transition:
+		opacity var(--slow) var(--ease),
+		transform var(--slow) var(--ease);
+	transition-delay: var(--reveal-delay, 0ms);
 }
+
+[data-reveal="in"] {
+	opacity: 1;
+	transform: none;
+}
+
+/* ── Focus ─────────────────────────────────────────────────────── */
+
+:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 3px;
+	border-radius: 2px;
+}
+
+/* ── Motion preferences ────────────────────────────────────────── */
+
+/*
+ * Everything above is decorative easing, so honouring this preference
+ * costs nothing: transitions collapse, reveals start visible.
+ */
+@media (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		transition-delay: 0ms !important;
+	}
+
+	[data-reveal] {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+/* ── Print ─────────────────────────────────────────────────────── */
 
 @media print {
 	:root {
 		--page-width: 100%;
+		--paper: #fff;
+		--surface: #fff;
 	}
 
 	body {
 		background: #fff;
 		font-size: 10.5pt;
+		line-height: 1.5;
 	}
 
-	/* project details are toggled with v-show — force them open on paper */
-	[id^="details-"] {
-		display: block !important;
+	/* Reveals must never hide content on paper */
+	[data-reveal] {
+		opacity: 1 !important;
+		transform: none !important;
 	}
 
 	.section {

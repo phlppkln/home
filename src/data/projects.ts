@@ -31,13 +31,13 @@ export const projects: Project[] = [
 		org: "TU Wien — Master's thesis",
 		period: "2021 – 2023",
 		summary:
-			"A Miro application and user study exploring how the infinite canvas can host collaborative, data-driven interactive articles. Awarded Different Brilliant at the IConCMT 2023 conference.",
+			"A Miro application and user study exploring how the infinite canvas can host collaborative, data-driven interactive articles, with GloVe word embeddings clustering participants' contributions by semantic similarity live on the board. Awarded Different Brilliant at the IConCMT 2023 conference.",
 		tags: [
 			"HCI research",
 			"information visualization",
 			"React",
 			"D3.js",
-			"word vectors",
+			"word embeddings",
 		],
 		details: {
 			context:
@@ -118,8 +118,8 @@ export const projects: Project[] = [
 		id: "see-more",
 		title: "SeeMore",
 		subtitle: "Awareness about urban paths, green space and everyday habits",
-		org: "Study project",
-		period: "",
+		org: "TU Wien — student project",
+		period: "2019 – 2020",
 		summary:
 			"A functional prototype motivating residents of the Seestadt district to spend more time in urban nature. Expert interviews, cultural probes, a design game and technology probes fed directly into the design.",
 		tags: ["user research", "design game", "urban design", "prototyping"],

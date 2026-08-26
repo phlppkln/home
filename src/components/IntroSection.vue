@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { profile } from "../data/profile";
+import HeroMark from "./HeroMark.vue";
 
 /** 24x24 filled glyphs, keyed by ContactLink.kind */
 const icons: Record<string, string> = {
@@ -14,9 +15,22 @@ const icons: Record<string, string> = {
 
 <template>
 	<section id="intro" class="section section--intro">
-		<div class="intro-head">
-			<h1 class="name">{{ profile.name }}</h1>
-			<ul class="contact">
+		<!--
+			The mark replaces the name visually, so the document heading is
+			kept for screen readers, search engines and the print stylesheet.
+		-->
+		<h1 class="visually-hidden">{{ profile.name }} — {{ profile.role }}</h1>
+
+		<HeroMark class="hero-mark" />
+
+		<div class="identity">
+			<p class="role" v-reveal>{{ profile.role }}</p>
+
+			<ul class="focus" v-reveal="80">
+				<li v-for="item in profile.focus" :key="item">{{ item }}</li>
+			</ul>
+
+			<ul class="contact" v-reveal="160">
 				<li v-for="link in profile.contact" :key="link.href">
 					<a
 						:href="link.href"
@@ -32,90 +46,111 @@ const icons: Record<string, string> = {
 				</li>
 			</ul>
 		</div>
-
-		<ul class="focus">
-			<li v-for="item in profile.focus" :key="item">{{ item }}</li>
-		</ul>
 	</section>
 </template>
 
 <style scoped>
 .section--intro {
-	padding-top: 3rem;
+	padding-top: 2.5rem;
+	padding-bottom: 3.5rem;
 }
 
-.intro-head {
+.hero-mark {
+	margin-bottom: 2.75rem;
+}
+
+
+.identity {
 	display: flex;
-	align-items: center;
-	flex-wrap: wrap;
-	gap: 1rem;
-	margin-bottom: 0.75rem;
-}
-
-.role {
-	display: flex;
-}
-
-.focus {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 1.2rem;
-	list-style: none;
-	padding-left: 0;
-	margin-bottom: 1.25rem;
-	font-size: 0.95rem;
-	li {
-		border-top: 1px solid var(--border);
-		border-bottom: 1px solid var(--border);
-		padding: 0.25rem 0.5rem;
-	}
-}
-
-.name {
-	font-size: clamp(2.25rem, 1.8rem + 2vw, 3rem);
-	color: var(--primary);
-	margin-bottom: 0;
+	flex-direction: column;
+	gap: 1.25rem;
 }
 
 .role {
 	font-family: var(--font-heading);
-	font-size: 1.25rem;
-	color: var(--accent);
-	margin-bottom: 0.25rem;
+	font-size: clamp(1.35rem, 1.05rem + 1.3vw, 1.85rem);
+	font-weight: 500;
+	letter-spacing: -0.015em;
+	line-height: 1.25;
+	color: var(--text);
 }
 
+/*
+ * Focus areas read as one quiet line divided by hairlines rather than as
+ * chips — fewer boxes, more air.
+ */
 .focus {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem 1.1rem;
+	list-style: none;
+	padding-left: 0;
+	font-size: 0.875rem;
+	line-height: 1.5;
 	color: var(--muted);
-	font-size: 0.95rem;
-	margin-bottom: 1.25rem;
+}
+
+.focus li {
+	position: relative;
+}
+
+.focus li + li {
+	padding-left: 1.1rem;
+}
+
+.focus li + li::before {
+	content: "";
+	position: absolute;
+	left: 0;
+	top: 0.25em;
+	bottom: 0.25em;
+	border-left: 1px solid var(--line-strong);
 }
 
 .contact {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 1rem;
-	margin-bottom: 0;
+	gap: 0.35rem;
 	list-style: none;
 	padding-left: 0;
+	margin-left: -0.5rem;
 }
 
 .contact a {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	padding: 0.35rem;
+	width: 2.25rem;
+	height: 2.25rem;
+	border-radius: 50%;
 	color: var(--muted);
 	text-decoration: none;
+	transition:
+		color var(--fast) var(--ease),
+		background-color var(--fast) var(--ease),
+		transform var(--fast) var(--ease);
 }
 
 .contact a:hover {
-	color: var(--primary);
+	color: var(--accent);
+	background: var(--surface-sunken);
+	transform: translateY(-2px);
+}
+
+.contact a:active {
+	transform: translateY(0);
 }
 
 .contact-icon {
-	width: 1.4rem;
-	height: 1.4rem;
+	width: 1.15rem;
+	height: 1.15rem;
 	fill: currentColor;
 	display: block;
+}
+
+@media (max-width: 40rem) {
+	.hero-mark {
+		margin-bottom: 2rem;
+	}
 }
 </style>
