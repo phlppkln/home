@@ -1,4 +1,4 @@
-# portfolio-essentials
+# home
 
 A minimal one-page portfolio for job applications — dense, scannable, and quick to share.
 Vanilla Vue 3 + TypeScript on Vite. No UI framework, no CSS framework, no animation

@@ -25,7 +25,7 @@ import ProjectsSection from "./components/ProjectsSection.vue";
 	</main>
 
 	<footer>
-		<a :href="profile.contact[0].href">{{ profile.contact[0].label }}</a>
+		<a :href="profile.contact[0].href">{{ profile.contact[0].kind }}</a>
 	</footer>
 </template>
 
