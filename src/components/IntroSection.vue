@@ -66,9 +66,10 @@ const icons: Record<string, string> = {
 	gap: 1.25rem;
 }
 
+/* The page's display line — it stays a step above the section headings */
 .role {
 	font-family: var(--font-heading);
-	font-size: clamp(1.35rem, 1.05rem + 1.3vw, 1.85rem);
+	font-size: clamp(1.9rem, 1.4rem + 2vw, 2.7rem);
 	font-weight: 500;
 	letter-spacing: -0.015em;
 	line-height: 1.25;

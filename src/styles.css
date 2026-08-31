@@ -106,19 +106,31 @@ ol {
 }
 
 /*
- * Section headings sit in the left margin as small caps rather than as
- * large type — the content carries the page, the label just orients you.
+ * Section headings carry real weight: display scale, full ink, and clear
+ * air beneath them, so a heading is never mistaken for a line of body
+ * copy. The mark sizes itself in `em`, so it grows with the type.
  */
 .section h2 {
 	display: flex;
 	align-items: center;
-	gap: 0.55rem;
-	font-size: 0.75rem;
+	gap: 0.6rem;
+	font-size: clamp(1.7rem, 1.3rem + 1.5vw, 2.2rem);
 	font-weight: 500;
-	text-transform: uppercase;
-	letter-spacing: 0.16em;
-	color: var(--faint);
-	margin-bottom: 2rem;
+	line-height: 1.15;
+	letter-spacing: -0.022em;
+	color: var(--text);
+	margin-bottom: 2.25rem;
+}
+
+/*
+ * Sub-headings inside a section — skill groups, card details — sit one
+ * clear step below the section heading and one clear step above body copy.
+ */
+.section h3 {
+	font-size: 1.15rem;
+	font-weight: 500;
+	letter-spacing: -0.014em;
+	color: var(--text);
 }
 
 /* ── Utilities ─────────────────────────────────────────────────── */

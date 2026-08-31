@@ -52,18 +52,20 @@ defineProps<{ variant: "ring" | "reeds" | "track" | "stack" }>();
 </template>
 
 <style scoped>
+/* Sized in `em` so the glyph tracks whatever heading it sits in */
 .mark {
 	flex: none;
-	width: 1.125rem;
-	height: 1.125rem;
+	width: 0.78em;
+	height: 0.78em;
 	overflow: visible;
+	color: var(--faint);
 }
 
-/* Strokes inherit the heading colour; only the accent note breaks out */
+/* Strokes stay quieter than the heading ink; only the accent note breaks out */
 .mark :is(circle, line) {
 	fill: none;
 	stroke: currentColor;
-	stroke-width: 1;
+	stroke-width: 1.2;
 }
 
 .dot,

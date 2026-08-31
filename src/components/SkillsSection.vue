@@ -6,82 +6,83 @@ import { skills } from "../data/skills";
 <template>
 	<section id="skills" class="section">
 		<h2><SectionMark variant="reeds" />Skills</h2>
-		<dl class="groups">
-			<template v-for="(group, index) in skills" :key="group.label">
-				<dt v-reveal="index * 60">{{ group.label }}</dt>
-				<dd v-reveal="index * 60">
-					<ul>
-						<li v-for="item in group.items" :key="item">{{ item }}</li>
-					</ul>
-				</dd>
-			</template>
-		</dl>
+
+		<div class="groups">
+			<section
+				v-for="(group, index) in skills"
+				:key="group.label"
+				class="group"
+				v-reveal="index * 60"
+			>
+				<h3>{{ group.label }}</h3>
+				<ul>
+					<li v-for="item in group.items" :key="item">{{ item }}</li>
+				</ul>
+			</section>
+		</div>
 	</section>
 </template>
 
 <style scoped>
 /*
- * Same two-column rhythm as the timeline, so the two sections read as one
- * system rather than as two separate lists.
+ * One block per group, stacked: the group name is a heading in its own
+ * right and its items sit underneath it. The previous two-column run
+ * packed every group into a single busy line of separated words — here
+ * the structure does the work, so the items themselves can stay quiet.
  */
 .groups {
-	display: grid;
-	grid-template-columns: 9rem 1fr;
-	gap: 0.35rem 1.25rem;
-}
-
-dt {
-	padding: 0.55rem 0;
-	font-family: var(--font-heading);
-	font-size: 0.8rem;
-	letter-spacing: 0.02em;
-	color: var(--faint);
-}
-
-dd {
-	padding: 0.55rem 0;
-}
-
-ul {
 	display: flex;
-	flex-wrap: wrap;
-	gap: 0.3rem 0.9rem;
+	flex-direction: column;
+	gap: 2rem;
+}
+
+/* A hairline between groups, not around them — no boxes */
+.group + .group {
+	border-top: 1px solid var(--line);
+	padding-top: 2rem;
+}
+
+h3 {
+	margin-bottom: 0.9rem;
+}
+
+/*
+ * Items wrap into even columns rather than flowing as one paragraph, so
+ * the eye can scan a group top-to-bottom instead of scrubbing a line.
+ */
+ul {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+	gap: 0.15rem 1.75rem;
 	list-style: none;
 	padding-left: 0;
-	font-size: 0.925rem;
-	line-height: 1.6;
+	font-size: 0.95rem;
+	line-height: 1.7;
+	color: var(--muted);
 }
 
-/* Hairline separators instead of chips — fewer boxes, same scannability */
+/* A short hairline tick instead of a bullet — quieter, still a list */
 li {
 	position: relative;
+	padding-left: 0.85rem;
 }
 
-li + li {
-	padding-left: 0.9rem;
-}
-
-li + li::before {
+li::before {
 	content: "";
 	position: absolute;
 	left: 0;
-	top: 0.3em;
-	bottom: 0.3em;
-	border-left: 1px solid var(--line-strong);
+	top: 0.85em;
+	width: 0.4rem;
+	border-top: 1px solid var(--line-strong);
 }
 
 @media (max-width: 40rem) {
 	.groups {
-		grid-template-columns: 1fr;
-		gap: 0;
+		gap: 1.6rem;
 	}
 
-	dt {
-		padding-bottom: 0;
-	}
-
-	dd {
-		padding-top: 0.35rem;
+	.group + .group {
+		padding-top: 1.6rem;
 	}
 }
 </style>

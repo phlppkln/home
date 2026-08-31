@@ -321,13 +321,14 @@ defineEmits<{ toggle: [] }>();
 	margin-bottom: 1.35rem;
 }
 
+/* Label caps, but inked and spaced enough to read as a heading */
 h4 {
-	font-size: 0.7rem;
+	font-size: 0.8rem;
 	font-weight: 500;
 	text-transform: uppercase;
-	letter-spacing: 0.11em;
-	color: var(--faint);
-	margin-bottom: 0.45rem;
+	letter-spacing: 0.1em;
+	color: var(--text);
+	margin-bottom: 0.5rem;
 }
 
 h4 + p,
