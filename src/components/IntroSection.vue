@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { profile } from "../data/profile";
-import HeroMark from "./HeroMark.vue";
 
 /** 24x24 filled glyphs, keyed by ContactLink.kind */
 const icons: Record<string, string> = {
@@ -20,8 +19,6 @@ const icons: Record<string, string> = {
 			kept for screen readers, search engines and the print stylesheet.
 		-->
 		<h1 class="visually-hidden">{{ profile.name }} — {{ profile.role }}</h1>
-
-		<HeroMark class="hero-mark" />
 
 		<div class="identity">
 			<p class="role" v-reveal>{{ profile.role }}</p>
@@ -50,13 +47,14 @@ const icons: Record<string, string> = {
 </template>
 
 <style scoped>
+/*
+ * The hero mark sits above this section in the page shell (it has to be a
+ * child of <main> to stay pinned for the whole page), so the air that used
+ * to be its bottom margin lives here now.
+ */
 .section--intro {
-	padding-top: 2.5rem;
+	padding-top: 2.75rem;
 	padding-bottom: 3.5rem;
-}
-
-.hero-mark {
-	margin-bottom: 2.75rem;
 }
 
 
@@ -150,8 +148,8 @@ const icons: Record<string, string> = {
 }
 
 @media (max-width: 40rem) {
-	.hero-mark {
-		margin-bottom: 2rem;
+	.section--intro {
+		padding-top: 2rem;
 	}
 }
 </style>

@@ -32,6 +32,15 @@
 	--page-width: 48rem;
 	--page-padding: 1.75rem;
 
+	/*
+	 * Height of the collapsed hero ridge: it keeps the SVG's width and its
+	 * scrolled viewBox is 640 x 96, so the band is 15% of the content width.
+	 * Set here because `scroll-padding-top` has to account for it, and
+	 * overridden per-breakpoint nowhere — the ratio is fixed.
+	 */
+	--ridge-h: calc((min(48rem, 100vw) - 2 * 1.75rem) * 0.15);
+	--topbar-h: 3.5rem;
+
 	--font-heading: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
 	--font-body: "Lato", system-ui, -apple-system, sans-serif;
 
@@ -52,7 +61,7 @@
 
 html {
 	scroll-behavior: smooth;
-	scroll-padding-top: 5rem;
+	scroll-padding-top: calc(var(--topbar-h) + var(--ridge-h) + 1.5rem);
 	-webkit-text-size-adjust: 100%;
 }
 

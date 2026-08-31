@@ -3,6 +3,7 @@ import { onBeforeUnmount, onMounted, ref } from "vue";
 import { profile } from "./data/profile";
 import { timeline } from "./data/timeline";
 import { useActiveSection } from "./composables/useActiveSection";
+import HeroMark from "./components/HeroMark.vue";
 import IntroSection from "./components/IntroSection.vue";
 import AboutSection from "./components/AboutSection.vue";
 import SkillsSection from "./components/SkillsSection.vue";
@@ -21,12 +22,33 @@ function onScroll() {
 	scrolled.value = window.scrollY > 12;
 }
 
+/**
+ * The hero mark pins directly below the topbar, and the topbar grows a row
+ * taller on narrow screens — so its measured height is published as a
+ * custom property rather than guessed at in two stylesheets.
+ */
+const topbar = ref<HTMLElement | null>(null);
+let observer: ResizeObserver | undefined;
+
 onMounted(() => {
 	onScroll();
 	window.addEventListener("scroll", onScroll, { passive: true });
+
+	if (topbar.value && typeof ResizeObserver !== "undefined") {
+		observer = new ResizeObserver(([entry]) => {
+			document.documentElement.style.setProperty(
+				"--topbar-h",
+				`${entry.target.getBoundingClientRect().height}px`,
+			);
+		});
+		observer.observe(topbar.value);
+	}
 });
 
-onBeforeUnmount(() => window.removeEventListener("scroll", onScroll));
+onBeforeUnmount(() => {
+	window.removeEventListener("scroll", onScroll);
+	observer?.disconnect();
+});
 
 const year = new Date().getFullYear();
 </script>
@@ -34,7 +56,7 @@ const year = new Date().getFullYear();
 <template>
 	<a class="skip-link" href="#about">Skip to content</a>
 
-	<header class="topbar" :class="{ 'is-scrolled': scrolled }">
+	<header ref="topbar" class="topbar" :class="{ 'is-scrolled': scrolled }">
 		<div class="topbar-inner">
 			<a class="brand" href="#intro">{{ profile.name }}</a>
 			<nav aria-label="Sections">
@@ -54,6 +76,7 @@ const year = new Date().getFullYear();
 	</header>
 
 	<main>
+		<HeroMark />
 		<IntroSection />
 		<AboutSection />
 		<SkillsSection />
