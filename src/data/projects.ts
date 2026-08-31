@@ -24,6 +24,40 @@ export interface Project {
 
 export const projects: Project[] = [
 	{
+		id: "condignum",
+		title: "Security Management Platform",
+		subtitle:
+			"Frontend for a cybersecurity SaaS platform — visualization, modernization, design consistency",
+		org: "condignum GmbH — Frontend developer",
+		period: "2024 – current",
+		summary:
+			"React frontend work on a cybersecurity SaaS platform: customer features that arrive as product-owner prototypes, and the visualization layer that has to make security data readable. Alongside the feature work I modernize libraries and legacy code and push the platform towards consistent design patterns and a better developer experience.",
+		tags: [
+			"React",
+			"information visualization",
+			"design patterns",
+			"legacy modernization",
+			"UI/UX",
+		],
+		details: {
+			context:
+				"The platform has grown with the product: many interconnected views over the same underlying security data, built by a small team. Features reach the frontend as prototypes from the product owners, which leaves the question of how they fit the rest of the platform — visually, structurally, and in terms of what they do to the views around them — to be answered during implementation.",
+			contribution: [
+				"Develop customer-facing features as a React developer in the DevOps team, taking product-owner prototypes to production frontend.",
+				"Analysed information visualization libraries against the platform's needs — what each one can express, where it stops, and what it costs to adopt and maintain — as the basis for how security data is presented.",
+				"Work on complex, interconnected features: trace how a change propagates through shared state and neighbouring views first, so side effects surface in the design rather than in production.",
+				"Modernize the platform by updating libraries and reworking legacy code, keeping the upgrade path incremental so feature delivery continues alongside it.",
+				"Watch over design consistency across the platform and integrate new design patterns where the same UI problem was being solved twice.",
+				"Analyse the existing platform for UI/UX and developer-experience improvements and turn the findings into concrete changes.",
+			],
+			outcome:
+				"Dependencies and legacy areas are brought up to date step by step without pausing feature delivery, and recurring interactions are increasingly covered by shared patterns instead of one-off solutions — which keeps the interface consistent for customers and the codebase faster to work in for the team.",
+			stack: ["React", "TypeScript"],
+			links: [],
+			note: "The platform is a commercial product — screenshots, customer details and metrics are not public.",
+		},
+	},
+	{
 		id: "reimagining-design",
 		title: "Reimagining Design",
 		subtitle:
