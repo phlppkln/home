@@ -16,7 +16,18 @@ export interface Project {
 		context: string;
 		contribution: string[];
 		outcome: string;
-		stack: string[];
+		/**
+		 * What you'd do differently now — a reflective critique, not a list
+		 * of regrets. Signals seniority. Leave unset until you've actually
+		 * written it in your own voice; the card hides the heading when
+		 * empty.
+		 */
+		reflection?: string;
+		/** Methodologies and research tools — study design, interviews, instruments. */
+		researchStack?: string[];
+		/** Design tools and process artifacts — prototyping, ideation frameworks. */
+		designStack?: string[];
+		techStack: string[];
 		links: ProjectLink[];
 		note?: string;
 	};
@@ -51,7 +62,13 @@ export const projects: Project[] = [
 			],
 			outcome:
 				"The thesis received the Different Brilliant award at IConCMT 2023. Key findings: shared and individual artifacts need fundamentally different spatial strategies; facilitator and participant roles must be supported separately in the interface; Gestalt principles are what make an open canvas readable; and axis labels measurably shape how participants answer.",
-			stack: [
+			researchStack: [
+				"Design study methodology (Sedlmair et al.)",
+				"Thinking-aloud study",
+				"Semi-structured interviews",
+			],
+			designStack: ["Gamestorming", "Canvas prototyping (Miro)"],
+			techStack: [
 				"Miro Web SDK",
 				"Miro REST API",
 				"React",
@@ -104,7 +121,15 @@ export const projects: Project[] = [
 			],
 			outcome:
 				"Introduced in 2024 as a mandatory part of the Informatics Bachelor admission process at TU Wien, with 1,600+ participants in the first official release. The study showed that effective modules need both: clear explanatory framing and meaningful interactive self-exploration — pure exploration leaves participants without orientation.",
-			stack: ["Vue.js", "Strapi", "JavaScript", "D3.js", "Chart.js", "Figma"],
+			researchStack: [
+				"Design Thinking process",
+				"Expert interviews",
+				"Controlled study design (two didactic modes)",
+				"FiT-I questionnaire",
+				"User study (n=28)",
+			],
+			designStack: ["Figma", "Contextual feedback design", "Progressive hints"],
+			techStack: ["Vue.js", "Strapi", "JavaScript", "D3.js", "Chart.js"],
 			links: [
 				{
 					label: "TU Wien admission procedure",
@@ -133,13 +158,14 @@ export const projects: Project[] = [
 			],
 			outcome:
 				"A working prototype plus a set of research insights on how green space can be integrated into everyday urban mobility rather than treated as a separate destination.",
-			stack: [
-				"Figma",
-				"Adobe XD",
-				"HTML/CSS/JavaScript",
-				"3D printing (SketchUp)",
-				"LaTeX",
+			researchStack: [
+				"Expert interviews",
+				"Cultural probes",
+				"Design game",
+				"Technology probes",
 			],
+			designStack: ["Figma", "Adobe XD", "Wireframing", "Mockup testing"],
+			techStack: ["HTML/CSS/JavaScript", "3D printing (SketchUp)", "LaTeX"],
 			links: [],
 		},
 	},
@@ -162,13 +188,12 @@ export const projects: Project[] = [
 			],
 			outcome:
 				"Higher fault tolerance produced faster but more error-prone typing; the stricter mode produced slower, more accurate typing. Players enjoyed the challenge of the hard mode but felt more satisfied with their performance in the easy one.",
-			stack: [
-				"Java",
-				"Android Studio",
-				"Google Play Services",
-				"REST + JSON",
-				"JASP",
+			researchStack: [
+				"Quantitative study design",
+				"Keystroke instrumentation",
+				"JASP (statistical analysis)",
 			],
+			techStack: ["Java", "Android Studio", "Google Play Services", "REST + JSON"],
 			links: [],
 		},
 	},
