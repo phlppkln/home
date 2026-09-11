@@ -69,8 +69,23 @@ defineEmits<{ toggle: [] }>();
 					<h4>Outcome</h4>
 					<p>{{ project.details.outcome }}</p>
 
-					<h4>Stack</h4>
-					<p class="stack">{{ project.details.stack.join(" · ") }}</p>
+					<template v-if="project.details.reflection">
+						<h4>What I'd do differently</h4>
+						<p>{{ project.details.reflection }}</p>
+					</template>
+
+					<template v-if="project.details.researchStack?.length">
+						<h4>Research stack</h4>
+						<p class="stack">{{ project.details.researchStack.join(" · ") }}</p>
+					</template>
+
+					<template v-if="project.details.designStack?.length">
+						<h4>Design stack</h4>
+						<p class="stack">{{ project.details.designStack.join(" · ") }}</p>
+					</template>
+
+					<h4>Tech stack</h4>
+					<p class="stack">{{ project.details.techStack.join(" · ") }}</p>
 
 					<template v-if="project.details.links.length">
 						<h4>Links</h4>
