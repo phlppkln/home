@@ -1,71 +1,91 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import SectionMark from "./SectionMark.vue";
 import {
-	defaultTimelineCategories,
+	defaultTimelineCategory,
 	timeline,
 	timelineCategories,
 	type TimelineCategory,
 } from "../data/timeline";
 
 /**
- * The reader assembles their own timeline: every category is a toggle and
- * any combination of them is valid, including none. Career is on by
- * default because that is what a first-time visitor came for.
+ * Three separate registers behind tabs. One category is shown at a time;
+ * the reader switches rather than composes. Career is the landing tab
+ * because that is what a first-time visitor came for.
  */
-const active = ref<TimelineCategory[]>([...defaultTimelineCategories]);
+const current = ref<TimelineCategory>(defaultTimelineCategory);
 
-function isActive(category: TimelineCategory): boolean {
-	return active.value.includes(category);
+function entriesFor(category: TimelineCategory) {
+	return timeline.filter((entry) => entry.category === category);
 }
 
-function toggle(category: TimelineCategory) {
-	active.value = isActive(category)
-		? active.value.filter((id) => id !== category)
-		: [...active.value, category];
+/*
+ * Arrow keys move between tabs and the moved-to tab activates on focus,
+ * per the WAI-ARIA tabs pattern — the panel is cheap to swap, so no need
+ * for a separate "select" step.
+ */
+const tabs = ref<HTMLButtonElement[]>([]);
+
+function onKeydown(event: KeyboardEvent, index: number) {
+	const last = timelineCategories.length - 1;
+	let next: number | undefined;
+	if (event.key === "ArrowRight") next = index === last ? 0 : index + 1;
+	else if (event.key === "ArrowLeft") next = index === 0 ? last : index - 1;
+	else if (event.key === "Home") next = 0;
+	else if (event.key === "End") next = last;
+	if (next === undefined) return;
+	event.preventDefault();
+	current.value = timelineCategories[next].id;
+	tabs.value[next]?.focus();
 }
-
-const visible = computed(() =>
-	timeline.filter((entry) => isActive(entry.category)),
-);
-
-/** Entry count per category, shown on its button so an empty toggle is no surprise */
-const counts = computed(() => {
-	const tally = {} as Record<TimelineCategory, number>;
-	for (const { id } of timelineCategories) tally[id] = 0;
-	for (const entry of timeline) tally[entry.category] += 1;
-	return tally;
-});
 </script>
 
 <template>
 	<section v-if="timeline.length" id="timeline" class="section">
 		<h2><SectionMark variant="track" />Timeline</h2>
 
-		<div class="filters" role="group" aria-label="Show timeline categories">
+		<div class="tabs" role="tablist" aria-label="Timeline registers">
 			<button
-				v-for="category in timelineCategories"
+				v-for="(category, index) in timelineCategories"
+				:id="`tab-${category.id}`"
 				:key="category.id"
-				class="filter"
-				:class="{ 'is-active': isActive(category.id) }"
+				ref="tabs"
+				class="tab"
+				:class="{ 'is-active': current === category.id }"
 				type="button"
-				:aria-pressed="isActive(category.id)"
-				@click="toggle(category.id)"
+				role="tab"
+				:aria-selected="current === category.id"
+				:aria-controls="`panel-${category.id}`"
+				:tabindex="current === category.id ? 0 : -1"
+				@click="current = category.id"
+				@keydown="onKeydown($event, index)"
 			>
 				{{ category.label }}
-				<span class="count" aria-hidden="true">{{ counts[category.id] }}</span>
 			</button>
 		</div>
 
 		<!--
-			aria-live so a screen reader hears the list change when a filter is
-			toggled — the buttons are far enough from the list that the change
-			would otherwise pass silently.
+			Every panel stays in the DOM (v-show, not v-if): on screen only the
+			selected one is displayed, on paper all three print in order with
+			a register heading each, so the PDF is complete. Rows still get
+			their reveal stagger when a tab is first opened, because hidden
+			elements never intersect until shown.
 		-->
-		<div aria-live="polite">
-			<ol v-if="visible.length" class="timeline">
+		<div
+			v-for="category in timelineCategories"
+			v-show="current === category.id"
+			:id="`panel-${category.id}`"
+			:key="category.id"
+			class="panel"
+			role="tabpanel"
+			:aria-labelledby="`tab-${category.id}`"
+			tabindex="0"
+		>
+			<h3 class="print-only">{{ category.label }}</h3>
+
+			<ol v-if="entriesFor(category.id).length" class="timeline">
 				<li
-					v-for="(entry, index) in visible"
+					v-for="(entry, index) in entriesFor(category.id)"
 					:key="entry.date + entry.text"
 					v-reveal="index * 55"
 				>
@@ -73,70 +93,80 @@ const counts = computed(() => {
 					<span class="text">
 						{{ entry.text }}
 						<span v-if="entry.kind" class="kind">{{ entry.kind }}</span>
+						<span v-if="entry.subtitle" class="subtitle">{{ entry.subtitle }}</span>
 					</span>
 				</li>
 			</ol>
 
-			<p v-else class="empty">
-				Pick a category above to build a timeline.
-			</p>
+			<p v-else class="empty">Nothing here yet.</p>
 		</div>
 	</section>
 </template>
 
 <style scoped>
-.filters {
+/*
+ * A tab strip on a single hairline. The selected tab is inked and carries
+ * a 2px accent rule that sits on top of the strip's line — same underline
+ * language as the site nav, but here it marks a register, not a place.
+ */
+.tabs {
 	display: flex;
-	flex-wrap: wrap;
-	gap: 0.5rem;
-	margin-bottom: 2rem;
+	gap: 1.75rem;
+	margin-bottom: 1.5rem;
+	border-bottom: 1px solid var(--line);
 }
 
-/*
- * Quiet hairline pills at rest, solid accent once on — the state has to
- * be readable at a glance, since it is what the list below is showing.
- */
-.filter {
-	display: inline-flex;
-	align-items: baseline;
-	gap: 0.4rem;
-	padding: 0.35rem 0.85rem;
-	border: 1px solid var(--line-strong);
-	border-radius: 999px;
-	background: transparent;
+.tab {
+	position: relative;
+	padding: 0.5rem 0 0.7rem;
+	margin-bottom: -1px;
+	border: 0;
+	background: none;
 	font-family: var(--font-heading);
-	font-size: 0.8rem;
+	font-size: 0.85rem;
 	font-weight: 500;
 	letter-spacing: 0.01em;
 	color: var(--muted);
 	cursor: pointer;
-	transition:
-		background-color var(--fast) var(--ease),
-		border-color var(--fast) var(--ease),
-		color var(--fast) var(--ease);
+	transition: color var(--fast) var(--ease);
 }
 
-.filter:hover {
-	border-color: var(--accent);
+.tab::after {
+	content: "";
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 2px;
+	background: var(--accent);
+	transform: scaleX(0);
+	transform-origin: left center;
+	transition: transform var(--base) var(--ease);
+}
+
+.tab:hover,
+.tab.is-active {
 	color: var(--text);
 }
 
-.filter.is-active {
-	background: var(--accent);
-	border-color: var(--accent);
-	color: var(--paper);
+.tab.is-active::after {
+	transform: scaleX(1);
 }
 
-.filter.is-active:hover {
-	background: var(--accent-hover);
-	border-color: var(--accent-hover);
-	color: var(--paper);
+.tab:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 2px;
+	border-radius: 2px;
 }
 
-.count {
-	font-size: 0.72rem;
-	opacity: 0.65;
-	font-variant-numeric: tabular-nums;
+.panel:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 4px;
+	border-radius: var(--radius);
+}
+
+.print-only {
+	display: none;
 }
 
 .timeline {
@@ -170,6 +200,13 @@ const counts = computed(() => {
 	font-size: 0.95rem;
 }
 
+.subtitle {
+	display: block;
+	margin-top: 0.15rem;
+	font-size: 0.85rem;
+	color: var(--faint);
+}
+
 .kind {
 	margin-left: 0.6rem;
 	font-family: var(--font-heading);
@@ -187,16 +224,39 @@ const counts = computed(() => {
 }
 
 @media (max-width: 40rem) {
+	.tabs {
+		gap: 1.25rem;
+	}
+
 	.timeline li {
 		grid-template-columns: 1fr;
 		gap: 0.2rem;
 	}
 }
 
-/* On paper the buttons are inert — only the chosen rows print */
+/* ── Print ─────────────────────────────────────────────────────── */
+
+/*
+ * Tabs are inert on paper, so every register prints in sequence with its
+ * own heading — the PDF has to be complete without interaction.
+ */
 @media print {
-	.filters {
+	.tabs {
 		display: none;
+	}
+
+	.panel {
+		display: block !important;
+		break-inside: avoid;
+	}
+
+	.panel + .panel {
+		margin-top: 1.5rem;
+	}
+
+	.print-only {
+		display: block;
+		margin-bottom: 0.5rem;
 	}
 }
 </style>

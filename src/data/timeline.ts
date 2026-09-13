@@ -1,30 +1,28 @@
-/** The four buckets the timeline filter offers. */
-export type TimelineCategory = "career" | "education" | "personal" | "other";
+/** The three registers the timeline offers as tabs. */
+export type TimelineCategory = "career" | "education" | "personal";
 
 export interface TimelineEntry {
 	/** Year or range, e.g. "2023" or "2021 – 2023" */
 	date: string;
 	/** The milestone itself — a label, not a sentence. No descriptions. */
 	text: string;
-	/** Which filter button shows this entry. */
+	/** Which tab shows this entry. */
 	category: TimelineCategory;
 	/** Optional grouping label shown as a small tag, e.g. "Certificate". */
 	kind?: string;
+	/** Optional second line under the text — e.g. related certificates. */
+	subtitle?: string;
 }
 
-/**
- * The filter buttons, in the order they are shown. `career` is the only
- * one active on load; the reader adds the others to build their own view.
- */
+/** The tabs, in the order they are shown. */
 export const timelineCategories: { id: TimelineCategory; label: string }[] = [
 	{ id: "career", label: "Career" },
 	{ id: "education", label: "Education" },
 	{ id: "personal", label: "Personal" },
-	{ id: "other", label: "Other" },
 ];
 
-/** Categories shown before the reader touches anything. */
-export const defaultTimelineCategories: TimelineCategory[] = ["career"];
+/** The tab open before the reader touches anything. */
+export const defaultTimelineCategory: TimelineCategory = "career";
 
 /**
  * Career, education and personal milestones — one short label each.
@@ -41,7 +39,7 @@ export const timeline: TimelineEntry[] = [
 	},
 	{
 		date: "since 2024",
-		category: "other",
+		category: "personal",
 		kind: "Volunteer",
 		text: "Mentor at CoderDojo",
 	},
@@ -49,13 +47,13 @@ export const timeline: TimelineEntry[] = [
 		date: "Oct 2025",
 		category: "personal",
 		kind: "Personal",
-		text: "Cycled 600 km through Andalusia, 8,750 m ascent",
+		text: "Cycled 600 km through Andalusian deserts, 8,750 m ascent",
 	},
 	{
 		date: "Jan – Mar 2024",
 		category: "personal",
 		kind: "Personal",
-		text: "Cycled 3,000 km through Patagonia, 30,000 m ascent",
+		text: "Cycled 3,000 km through Patagonia's landscapes, 30,000 m ascent",
 	},
 	{
 		date: "2020 – 2024",
@@ -82,18 +80,6 @@ export const timeline: TimelineEntry[] = [
 		text: "Tutor, Interface and Interaction Design, TU Wien",
 	},
 	{
-		date: "2015 – 2016",
-		category: "education",
-		kind: "Certificate",
-		text: "Viticulture and wine production",
-	},
-	{
-		date: "2014 – 2015",
-		category: "education",
-		kind: "Certificate",
-		text: "Agriculture",
-	},
-	{
 		date: "2013 – 2019",
 		category: "education",
 		kind: "Education",
@@ -101,8 +87,9 @@ export const timeline: TimelineEntry[] = [
 	},
 	{
 		date: "2012 – 2024",
-		category: "other",
-		kind: "Other",
+		category: "personal",
+		kind: "Personal",
 		text: "Agriculture and Farming, Pamhagen",
+		subtitle: "Certificates: Agriculture · Viticulture and wine production",
 	},
 ];

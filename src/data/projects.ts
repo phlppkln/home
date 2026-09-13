@@ -63,7 +63,7 @@ export const projects: Project[] = [
 			],
 			outcome:
 				"Dependencies and legacy areas are brought up to date step by step without pausing feature delivery, and recurring interactions are increasingly covered by shared patterns instead of one-off solutions — which keeps the interface consistent for customers and the codebase faster to work in for the team.",
-			stack: ["React", "TypeScript"],
+			techStack: ["React", "TypeScript"],
 			links: [],
 			note: "The platform is a commercial product — screenshots, customer details and metrics are not public.",
 		},
