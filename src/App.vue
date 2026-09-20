@@ -13,8 +13,28 @@ import ProjectsSection from "./components/ProjectsSection.vue";
 const { active } = useActiveSection(["intro", "about", "skills", "timeline", "projects"]);
 
 /**
+ * The section nav lives in the topbar, and once the hero ridge has pinned
+ * it renders the same list as sector labels under the ridge — so the list
+ * is built once here. Timeline is only offered while it has entries,
+ * matching the section itself.
+ */
+const sections = [
+	{ id: "about", label: "About" },
+	{ id: "skills", label: "Skills" },
+	...(timeline.length ? [{ id: "timeline", label: "Timeline" }] : []),
+	{ id: "projects", label: "Projects" },
+];
+
+/**
+ * True once the ridge rests pinned under the topbar. The links then live
+ * in the band's row, and the topbar's copy fades out and goes inert so
+ * there is only ever one live nav.
+ */
+const pinned = ref(false);
+
+/**
  * The topbar is flat against the page at rest and only earns its hairline
- * and blur once content has scrolled under it.
+ * once content has scrolled under it.
  */
 const scrolled = ref(false);
 
@@ -56,27 +76,27 @@ const year = new Date().getFullYear();
 <template>
 	<a class="skip-link" href="#about">Skip to content</a>
 
-	<header ref="topbar" class="topbar" :class="{ 'is-scrolled': scrolled }">
+	<header
+		ref="topbar"
+		class="topbar"
+		:class="{ 'is-scrolled': scrolled, 'is-pinned': pinned }"
+	>
 		<div class="topbar-inner">
 			<a class="brand" href="#intro">{{ profile.name }}</a>
-			<nav aria-label="Sections">
-				<a :class="{ 'is-active': active === 'about' }" href="#about">About</a>
-				<a :class="{ 'is-active': active === 'skills' }" href="#skills">Skills</a>
+			<nav aria-label="Sections" :inert="pinned">
 				<a
-					v-if="timeline.length"
-					:class="{ 'is-active': active === 'timeline' }"
-					href="#timeline"
-					>Timeline</a
-				>
-				<a :class="{ 'is-active': active === 'projects' }" href="#projects"
-					>Projects</a
+					v-for="section in sections"
+					:key="section.id"
+					:class="{ 'is-active': active === section.id }"
+					:href="`#${section.id}`"
+					>{{ section.label }}</a
 				>
 			</nav>
 		</div>
 	</header>
 
 	<main>
-		<HeroMark />
+		<HeroMark :sections="sections" :active="active" @pinned="pinned = $event" />
 		<IntroSection />
 		<AboutSection />
 		<SkillsSection />
@@ -116,20 +136,25 @@ const year = new Date().getFullYear();
 
 /* ── Topbar ────────────────────────────────────────────────────── */
 
+/*
+ * Solid paper, the same ground as the ridge band pinned under it, so the
+ * two read as one opaque header and nothing shows through from behind.
+ */
 .topbar {
 	position: sticky;
 	top: 0;
 	z-index: 10;
-	background: color-mix(in srgb, var(--paper) 82%, transparent);
+	background: var(--paper);
 	border-bottom: 1px solid transparent;
-	transition:
-		border-color var(--base) var(--ease),
-		backdrop-filter var(--base) var(--ease);
+	transition: border-color var(--base) var(--ease);
 }
 
-.topbar.is-scrolled {
+/*
+ * The hairline belongs to the nav row: it shows while the links are up
+ * here and goes with them once they have moved down under the ridge.
+ */
+.topbar.is-scrolled:not(.is-pinned) {
 	border-bottom-color: var(--line);
-	backdrop-filter: blur(10px) saturate(1.4);
 }
 
 .topbar-inner {
@@ -139,7 +164,7 @@ const year = new Date().getFullYear();
 	gap: 1.5rem;
 	width: min(var(--page-width), 100%);
 	margin: 0 auto;
-	padding: 0.9rem var(--page-padding);
+	padding: 0.6rem var(--page-padding);
 }
 
 .brand {
@@ -162,6 +187,22 @@ nav {
 	display: flex;
 	gap: 1.5rem;
 	font-size: 0.85rem;
+}
+
+/*
+ * The hand-off. The topbar's links fade and drift down a touch as the
+ * ridge pins, while the band's sector labels rise into their row (see
+ * HeroMark). Scrolling back up plays it in reverse.
+ */
+.topbar nav {
+	transition:
+		opacity var(--base) var(--ease),
+		transform var(--base) var(--ease);
+}
+
+.topbar.is-pinned nav {
+	opacity: 0;
+	transform: translateY(4px);
 }
 
 nav a {
@@ -250,6 +291,15 @@ footer {
 		width: 100%;
 		gap: 1.05rem;
 		font-size: 0.8rem;
+	}
+
+	/*
+	 * Here the nav is a row of its own, and an empty row is dead height on
+	 * a phone — so once the links have moved down, the row goes too and
+	 * the ridge glides up to fill it (see `.ridge` in HeroMark).
+	 */
+	.topbar.is-pinned nav {
+		display: none;
 	}
 }
 

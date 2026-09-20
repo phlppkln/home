@@ -19,7 +19,21 @@
  * baseline — plus one rider, the only figurative thing on the page.
  */
 
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+
+/**
+ * Once pinned the band is also the page's section nav, read like a stage
+ * profile: each section owns the stretch of the ridge it is scrolled
+ * through, its label centred beneath and the current one underlined by a
+ * bar along its stretch. The shell passes the sections and which one is
+ * current; the band reports when it is pinned so the shell can fade its
+ * own topbar copy out and hand over.
+ */
+const props = defineProps<{
+	sections: { id: string; label: string }[];
+	active: string;
+}>();
+const emit = defineEmits<{ pinned: [value: boolean] }>();
 
 const VIEW_W = 640;
 const FIELD_X0 = 36;
@@ -29,9 +43,16 @@ const REED_COUNT = 72;
  * The two poses the mark interpolates between. `viewH` shrinks with the
  * rest, which is what makes the pinned band shallow: the SVG keeps its
  * width, so the drawing scale never changes and hairlines stay hairlines.
+ *
+ * `rider` scales the cyclist with the pose. In the ridge the reeds are a
+ * third of their hero height, and a hero-sized rider would tower over
+ * them with its helmet against the nav's hairline. The ridge's `baseY`
+ * is the tallest reed plus the rider plus a hair — the topbar above is
+ * opaque, so that is the least room that keeps the rider whole at the
+ * summit; under the baseline sits the current sector's bar (see below).
  */
-const HERO = { viewH: 212, baseY: 178, fieldX1: 430, amp: 1, discX: 524 };
-const RIDGE = { viewH: 96, baseY: 76, fieldX1: 566, amp: 0.3, discX: 600 };
+const HERO = { viewH: 212, baseY: 178, fieldX1: 430, amp: 1, discX: 524, rider: 1 };
+const RIDGE = { viewH: 59, baseY: 43, fieldX1: 566, amp: 0.18, discX: 600, rider: 0.64 };
 
 /** Scroll distance over which the hero pose collapses into the ridge. */
 const COLLAPSE_PX = 220;
@@ -123,13 +144,17 @@ const rendered = ref(0);
 
 /**
  * The mark scales with the column, which on a phone would leave the rider
- * around ten pixels tall — a smudge rather than a cyclist. Below that it
- * grows back to a readable size against the ridge.
+ * around ten pixels tall — a smudge rather than a cyclist. So the pose's
+ * scale is floored at a legible pixel height (a little lower in the
+ * ridge, where the rider is meant to be small) and capped so it never
+ * grows past a bicycle on a phone-width hero.
  */
 const riderScale = computed(() => {
-	if (!rendered.value) return 1;
-	const px = (RIDER_H * rendered.value) / VIEW_W;
-	return clamp(18 / px, 1, 1.8);
+	const pose = lerp(HERO.rider, RIDGE.rider, compact.value);
+	if (!rendered.value) return pose;
+	const natural = (RIDER_H * rendered.value) / VIEW_W;
+	const floor = lerp(18, 13, compact.value);
+	return clamp(Math.max(pose * natural, floor) / natural, RIDGE.rider, 1.8);
 });
 
 const rider = computed(() => {
@@ -153,6 +178,75 @@ const rider = computed(() => {
 
 /** The rings belong to the hero pose only — they cannot fit the ridge. */
 const ringOpacity = computed(() => Math.max(0, 1 - compact.value * 1.8));
+
+/** Fully collapsed and resting under the topbar — the "sticky" state proper. */
+const pinned = computed(() => compact.value >= 1);
+watch(pinned, (value) => emit("pinned", value));
+
+/* ── Sectors ───────────────────────────────────────────────────── */
+
+/** How far the current sector's bar sits below the baseline, in view units. */
+const AXIS_DROP = 7;
+
+interface Range {
+	id: string;
+	label: string;
+	/** Scroll progress over which this section holds the viewport's centre. */
+	from: number;
+	to: number;
+}
+
+const ranges = ref<Range[]>([]);
+/** Document height the ranges were measured at; re-measured when it moves. */
+let measuredAt = 0;
+
+/**
+ * A section is "current" while it crosses the middle of the viewport
+ * (useActiveSection), so its stretch of the ridge runs from the scroll
+ * position where its top reaches the centre line to where its bottom
+ * does. Neighbouring sections abut, so the sectors tile the ridge; the
+ * intro before the first one is the neutral run-up, unlabelled.
+ */
+function measureSections() {
+	const max = document.documentElement.scrollHeight - window.innerHeight;
+	if (max <= 4) {
+		ranges.value = [];
+		return;
+	}
+	const centre = window.innerHeight / 2;
+	const y = window.scrollY;
+
+	ranges.value = props.sections.flatMap(({ id, label }) => {
+		const el = document.getElementById(id);
+		if (!el) return [];
+		const rect = el.getBoundingClientRect();
+		const top = rect.top + y;
+		return [
+			{
+				id,
+				label,
+				from: clamp((top - centre) / max, 0, 1),
+				to: clamp((top + rect.height - centre) / max, 0, 1),
+			},
+		];
+	});
+}
+
+const sectors = computed(() =>
+	ranges.value.map((range) => ({
+		...range,
+		x0: lerp(FIELD_X0, discX.value, range.from),
+		x1: lerp(FIELD_X0, discX.value, range.to),
+	})),
+);
+
+/** A label under the pointer or keyboard focus lights its sector too. */
+const hovered = ref("");
+const lit = computed(() => hovered.value || props.active);
+const litSector = computed(() => sectors.value.find((s) => s.id === lit.value));
+
+/** View units → percentage of the band, for the HTML labels under the SVG. */
+const pct = (units: number) => `${((units / VIEW_W) * 100).toFixed(3)}%`;
 /** Arrival flare on the clay disc over the last stretch of the page. */
 const arrival = computed(() => smooth(clamp((progress.value - 0.9) / 0.1, 0, 1)));
 
@@ -190,21 +284,34 @@ let observer: ResizeObserver | undefined;
 
 function measure() {
 	frame = 0;
-	const max = document.documentElement.scrollHeight - window.innerHeight;
+	const height = document.documentElement.scrollHeight;
+	const max = height - window.innerHeight;
 	const y = window.scrollY;
 
 	progress.value = max > 4 ? clamp(y / max, 0, 1) : 0;
 	compact.value = smooth(clamp(y / COLLAPSE_PX, 0, 1));
+
+	// Sections move when the page grows (a project card opening, say)
+	if (height !== measuredAt) {
+		measuredAt = height;
+		measureSections();
+	}
 }
 
 function onScroll() {
 	if (!frame) frame = requestAnimationFrame(measure);
 }
 
+/** A resize moves the centre line even when the document height holds. */
+function onResize() {
+	measuredAt = 0;
+	onScroll();
+}
+
 onMounted(() => {
 	measure();
 	window.addEventListener("scroll", onScroll, { passive: true });
-	window.addEventListener("resize", onScroll, { passive: true });
+	window.addEventListener("resize", onResize, { passive: true });
 
 	if (svg.value && typeof ResizeObserver !== "undefined") {
 		observer = new ResizeObserver(([entry]) => {
@@ -218,7 +325,7 @@ onBeforeUnmount(() => {
 	if (frame) cancelAnimationFrame(frame);
 	observer?.disconnect();
 	window.removeEventListener("scroll", onScroll);
-	window.removeEventListener("resize", onScroll);
+	window.removeEventListener("resize", onResize);
 });
 </script>
 
@@ -230,7 +337,7 @@ onBeforeUnmount(() => {
 		is empty overlay, hence `pointer-events: none`.
 	-->
 	<div class="ridge">
-		<div class="ridge-band">
+		<div class="ridge-band" :style="{ '--compact': compact.toFixed(3) }">
 			<svg
 				ref="svg"
 				class="mark"
@@ -311,6 +418,23 @@ onBeforeUnmount(() => {
 					/>
 				</g>
 
+				<!--
+					The current sector, marked under the baseline with one accent
+					bar spanning its stretch — the sectors themselves are implied
+					by the labels, not drawn. Fades in with the collapse: in the
+					hero pose the mark is a picture, not a map.
+				-->
+				<g class="axis" :style="{ opacity: compact }">
+					<line
+						v-if="litSector"
+						class="axis-bar"
+						:x1="litSector.x0"
+						:x2="litSector.x1"
+						:y1="baseY + AXIS_DROP"
+						:y2="baseY + AXIS_DROP"
+					/>
+				</g>
+
 				<!-- The finish: the rider arrives here at the end of the page -->
 				<circle
 					class="finish"
@@ -349,6 +473,34 @@ onBeforeUnmount(() => {
 					</g>
 				</g>
 			</svg>
+
+			<!--
+				The label row opens under the ridge only while pinned: a 0fr → 1fr
+				grid row, so the band grows and the ground and shadow follow it.
+				Each label is an HTML link (so it keeps a real hit area and
+				text size on a phone, unlike SVG text) spanning its sector's
+				width and centred in it. `inert` keeps the parked row out of
+				the tab order and the accessibility tree while the topbar's
+				copy is the live one.
+			-->
+			<div class="ridge-nav" :class="{ 'is-open': pinned }" :inert="!pinned">
+				<div class="ridge-nav-clip">
+					<nav class="labels" :class="{ 'is-in': pinned }" aria-label="Sections">
+						<a
+							v-for="sector in sectors"
+							:key="sector.id"
+							:href="`#${sector.id}`"
+							:class="{ 'is-active': sector.id === active }"
+							:style="{ left: pct(sector.x0), width: pct(sector.x1 - sector.x0) }"
+							@mouseenter="hovered = sector.id"
+							@mouseleave="hovered = ''"
+							@focus="hovered = sector.id"
+							@blur="hovered = ''"
+							>{{ sector.label }}</a
+						>
+					</nav>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
@@ -365,25 +517,40 @@ onBeforeUnmount(() => {
 	aspect-ratio: 640 / 212;
 	margin-top: 2.5rem;
 	pointer-events: none;
+	/* The topbar loses its nav row on phones once pinned; glide up, don't jump */
+	transition: top var(--base) var(--ease);
 }
 
 /*
- * Hugs the drawing, so the paper ground and the fade below it follow the
- * band as it collapses instead of covering the whole reserved box.
+ * Hugs the drawing, so the paper ground follows the band as it collapses
+ * instead of covering the whole reserved box.
  */
 .ridge-band {
 	position: relative;
-	background: var(--paper);
 }
 
-.ridge-band::after {
+/*
+ * The ground and its shadow bleed to the viewport edges, like the topbar
+ * above it, so the pinned band reads as the lower half of one header bar
+ * rather than a card floating in the column. The shadow is what lifts it
+ * off the content scrolling under it: its alpha follows `--compact`, so
+ * at rest — where the mark is part of the hero, not a bar — there is
+ * none, and it comes in with the collapse. (100vw includes a classic
+ * scrollbar's width; the root clips that sliver, see styles.css.)
+ */
+.ridge-band::before {
 	content: "";
 	position: absolute;
-	left: 0;
-	right: 0;
-	top: 100%;
-	height: 0.9rem;
-	background: linear-gradient(var(--paper), transparent);
+	top: 0;
+	bottom: 0;
+	left: 50%;
+	z-index: -1;
+	width: 100vw;
+	transform: translateX(-50%);
+	background: var(--paper);
+	box-shadow:
+		0 1px 0 rgb(34 32 28 / calc(0.05 * var(--compact, 0))),
+		0 10px 24px -12px rgb(34 32 28 / calc(0.22 * var(--compact, 0)));
 }
 
 .mark {
@@ -391,6 +558,93 @@ onBeforeUnmount(() => {
 	width: 100%;
 	height: auto;
 	overflow: visible;
+}
+
+/* ── Nav row ───────────────────────────────────────────────────── */
+
+.ridge-nav {
+	display: grid;
+	grid-template-rows: 0fr;
+	transition: grid-template-rows var(--base) var(--ease);
+	/* The pinned box swallows no clicks — except here, where the links live */
+	pointer-events: auto;
+}
+
+.ridge-nav.is-open {
+	grid-template-rows: 1fr;
+}
+
+.ridge-nav-clip {
+	overflow: hidden;
+}
+
+/*
+ * Category labels of a chart axis: small caps in the heading face, each
+ * centred under its sector. They rise into the row from below once the
+ * band pins, a beat after the topbar's copy has faded.
+ */
+.labels {
+	position: relative;
+	height: var(--ridge-nav-h);
+	opacity: 0;
+	transform: translateY(100%);
+	transition:
+		opacity var(--base) var(--ease),
+		transform var(--base) var(--ease);
+}
+
+.labels.is-in {
+	opacity: 1;
+	transform: none;
+	transition-delay: 80ms;
+}
+
+.labels a {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-family: var(--font-heading);
+	font-size: 0.66rem;
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: 0.11em;
+	white-space: nowrap;
+	color: var(--muted);
+	text-decoration: none;
+	transition: color var(--fast) var(--ease);
+}
+
+.labels a:hover,
+.labels a:focus-visible {
+	color: var(--text);
+}
+
+.labels a.is-active {
+	color: var(--accent);
+}
+
+.labels a:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: -2px;
+	border-radius: 2px;
+}
+
+@media (max-width: 40rem) {
+	.labels a {
+		font-size: 0.58rem;
+		letter-spacing: 0.08em;
+	}
+}
+
+/* ── Current sector ────────────────────────────────────────────── */
+
+.axis-bar {
+	stroke: var(--accent);
+	stroke-width: 2;
+	stroke-linecap: round;
 }
 
 /* ── Baseline ──────────────────────────────────────────────────── */
@@ -549,8 +803,12 @@ onBeforeUnmount(() => {
 		position: static;
 	}
 
+	.ridge-band::before {
+		box-shadow: none;
+	}
+
 	.rider,
-	.ridge-band::after {
+	.ridge-nav {
 		display: none;
 	}
 }

@@ -34,11 +34,13 @@
 
 	/*
 	 * Height of the collapsed hero ridge: it keeps the SVG's width and its
-	 * scrolled viewBox is 640 x 96, so the band is 15% of the content width.
-	 * Set here because `scroll-padding-top` has to account for it, and
-	 * overridden per-breakpoint nowhere — the ratio is fixed.
+	 * scrolled viewBox is 640 x 59, so the band is 9.2% of the content
+	 * width. Set here because `scroll-padding-top` has to account for it,
+	 * and overridden per-breakpoint nowhere — the ratio is fixed.
 	 */
-	--ridge-h: calc((min(48rem, 100vw) - 2 * 1.75rem) * 0.15);
+	--ridge-h: calc((min(48rem, 100vw) - 2 * 1.75rem) * 0.092);
+	/* The sector-label row that opens under the ridge once it is pinned. */
+	--ridge-nav-h: 1.9rem;
 	--topbar-h: 3.5rem;
 
 	--font-heading: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
@@ -61,7 +63,16 @@
 
 html {
 	scroll-behavior: smooth;
-	scroll-padding-top: calc(var(--topbar-h) + var(--ridge-h) + 1.5rem);
+	scroll-padding-top: calc(
+		var(--topbar-h) + var(--ridge-h) + var(--ridge-nav-h) + 1.5rem
+	);
+	/*
+	 * The pinned ridge's ground is 100vw wide, which on a classic scrollbar
+	 * overshoots the viewport by the bar's width. `clip` (not `hidden`)
+	 * cuts that off without turning the root into a scroll container,
+	 * which would break the sticky header.
+	 */
+	overflow-x: clip;
 	-webkit-text-size-adjust: 100%;
 }
 
