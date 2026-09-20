@@ -3,6 +3,23 @@ export interface ProjectLink {
 	href: string;
 }
 
+export interface ProjectImage {
+	/** Path under public/, without the deployment base — e.g. "img/projects/osa/x.png". */
+	src: string;
+	/** What is in the picture, for readers who cannot see it. */
+	alt: string;
+	/** One line shown under the image — what it demonstrates, not what it is. */
+	caption?: string;
+	/** Intrinsic pixel size, so the layout reserves the space before the file loads. */
+	width: number;
+	height: number;
+	/**
+	 * Which section's text the figure follows. Unset puts it at the top of
+	 * the expanded view, before any text.
+	 */
+	after?: "context" | "contribution" | "outcome";
+}
+
 export interface Project {
 	id: string;
 	title: string;
@@ -29,6 +46,8 @@ export interface Project {
 		designStack?: string[];
 		techStack: string[];
 		links: ProjectLink[];
+		/** Figures in the expanded view — see ProjectImage.after for placement. */
+		images?: ProjectImage[];
 		note?: string;
 	};
 }
@@ -95,7 +114,7 @@ export const projects: Project[] = [
 				"Designed a refined prototype around Gamestorming: participants annotate shared images, and GloVe word vectors cluster them by semantic similarity directly on the board.",
 			],
 			outcome:
-				"The thesis received the Different Brilliant award at IConCMT 2023. Key findings: shared and individual artifacts need fundamentally different spatial strategies; facilitator and participant roles must be supported separately in the interface; Gestalt principles are what make an open canvas readable; and axis labels measurably shape how participants answer.",
+				"The thesis received the Different Brilliant award at IConCMT 2023. Key findings: shared and individual artifacts need fundamentally different spatial strategies; facilitator and participant roles must be supported separately in the interface; Gestalt principles are what make an open canvas readable; and axis labels measurably shape how participants answer. All of this rests on the model below, which frames the Miro board itself as a visual analytics system: board items are the data, modal and panel are the views, and the SDK carries data in both directions.",
 			researchStack: [
 				"Design study methodology (Sedlmair et al.)",
 				"Thinking-aloud study",
@@ -110,6 +129,15 @@ export const projects: Project[] = [
 				"TypeScript",
 				"D3.js",
 				"GloVe",
+			],
+			images: [
+				{
+					src: "img/projects/reimagining-design/miro_va_system_updated.jpg",
+					alt: "Diagram of the Miro board read as a visual analytics system: board items with entities, relationships and metadata exchange data with a modal and a side panel that host D3 visualizations — a clustered heatmap, a network graph and a scatter plot — supporting analyze, present, explore, interact and export.",
+					width: 1174,
+					height: 851,
+					after: "outcome",
+				},
 			],
 			links: [
 				{
@@ -149,7 +177,7 @@ export const projects: Project[] = [
 				"Built the proof of concept and the production platform: Vue.js frontend, Strapi headless CMS with a REST API.",
 				"Ran the project along the Design Thinking process — literature review, proof of concept, expert interviews, full prototype, user study, iterations.",
 				"Designed interactive experiment modules with a contextual feedback system and progressive hints, so participants keep moving without losing the explorative character of the task.",
-				"Set up a built-in design experiment contrasting two didactic approaches: learning by doing (Sortieren mit System) versus explanation before application with storytelling (Mit Sicherheit).",
+				"Set up a built-in design experiment contrasting two didactic approaches: learning by doing (Sortieren mit System, pictured below as its feedback steps in after a doubtful move) versus explanation before application with storytelling (Mit Sicherheit).",
 				"Conducted a user study with 28 computer science students and abstracted the feedback into a reusable framework for designing further modules.",
 				"Built the results view combining task telemetry (attempts, hint usage) with scores from the validated FiT-I questionnaire, developed with an external psychology institute.",
 			],
@@ -164,6 +192,15 @@ export const projects: Project[] = [
 			],
 			designStack: ["Figma", "Contextual feedback design", "Progressive hints"],
 			techStack: ["Vue.js", "Strapi", "JavaScript", "D3.js", "Chart.js"],
+			images: [
+				{
+					src: "img/projects/osa/sortieren_mit_system.png",
+					alt: "Screenshot of the Sortieren mit System module: five face-down cards in a row, each with a reveal and a pin button; two cards are turned over showing 5 and 1, arrows point at the pin on the first card and at both buttons on the fourth, and a feedback box below reads: consider again whether it makes sense to place the marker on the card you chose.",
+					width: 1927,
+					height: 1032,
+					after: "contribution",
+				},
+			],
 			links: [
 				{
 					label: "TU Wien admission procedure",

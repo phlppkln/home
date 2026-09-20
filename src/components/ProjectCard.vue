@@ -1,8 +1,16 @@
 <script setup lang="ts">
-import type { Project } from "../data/projects";
+import type { Project, ProjectImage } from "../data/projects";
+import ProjectFigure from "./ProjectFigure.vue";
 
-defineProps<{ project: Project; expanded: boolean }>();
+const props = defineProps<{ project: Project; expanded: boolean }>();
 defineEmits<{ toggle: [] }>();
+
+/** Figures that follow the given section's text; no section = top of the body. */
+function imagesAfter(section?: ProjectImage["after"]) {
+	return (props.project.details.images ?? []).filter(
+		(image) => image.after === section,
+	);
+}
 </script>
 
 <template>
@@ -56,8 +64,25 @@ defineEmits<{ toggle: [] }>();
 		>
 			<div class="disclosure-clip">
 				<div class="card-body">
+					<!--
+						A figure without a section leads the expanded view: the
+						reader gets the picture first and the prose after. One
+						with a section follows that section's text, where the
+						prose can refer to it.
+					-->
+					<ProjectFigure
+						v-for="image in imagesAfter()"
+						:key="image.src"
+						:image="image"
+					/>
+
 					<h4>Context</h4>
 					<p>{{ project.details.context }}</p>
+					<ProjectFigure
+						v-for="image in imagesAfter('context')"
+						:key="image.src"
+						:image="image"
+					/>
 
 					<h4>What I did</h4>
 					<ul class="contribution">
@@ -65,9 +90,19 @@ defineEmits<{ toggle: [] }>();
 							{{ item }}
 						</li>
 					</ul>
+					<ProjectFigure
+						v-for="image in imagesAfter('contribution')"
+						:key="image.src"
+						:image="image"
+					/>
 
 					<h4>Outcome</h4>
 					<p>{{ project.details.outcome }}</p>
+					<ProjectFigure
+						v-for="image in imagesAfter('outcome')"
+						:key="image.src"
+						:image="image"
+					/>
 
 					<template v-if="project.details.reflection">
 						<h4>What I'd do differently</h4>
@@ -349,6 +384,16 @@ h4 {
 h4 + p,
 h4 + ul {
 	margin-bottom: 1.4rem;
+}
+
+/*
+ * Text that introduces a figure keeps it close — the sentence and the
+ * picture read as one unit, and the figure's own bottom margin does the
+ * separating from the next heading. Browsers without :has() keep the
+ * normal gap, which is only a little looser.
+ */
+.card-body :is(p, ul):has(+ .figure) {
+	margin-bottom: 0.75rem;
 }
 
 .card-body p,
