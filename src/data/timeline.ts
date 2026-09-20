@@ -10,7 +10,7 @@ export interface TimelineEntry {
 	category: TimelineCategory;
 	/** Optional grouping label shown as a small tag, e.g. "Certificate". */
 	kind?: string;
-	/** Optional second line under the text — e.g. related certificates. */
+	/** Optional second line under the text — employer, institution, certificates. */
 	subtitle?: string;
 }
 
@@ -34,8 +34,8 @@ export const timeline: TimelineEntry[] = [
 	{
 		date: "since 2024",
 		category: "career",
-		kind: "Career",
-		text: "Frontend developer, condignum GmbH",
+		text: "Frontend Developer",
+		subtitle: "condignum GmbH",
 	},
 	{
 		date: "since 2024",
@@ -46,49 +46,52 @@ export const timeline: TimelineEntry[] = [
 	{
 		date: "Oct 2025",
 		category: "personal",
-		kind: "Personal",
 		text: "Cycled 600 km through Andalusian deserts, 8,750 m ascent",
 	},
 	{
 		date: "Jan – Mar 2024",
 		category: "personal",
-		kind: "Personal",
 		text: "Cycled 3,000 km through Patagonia's landscapes, 30,000 m ascent",
 	},
 	{
-		date: "2020 – 2024",
+		date: "Apr – Jun 2024",
 		category: "career",
-		kind: "Career",
-		text: "Online Self Assessment, TU Wien",
+		text: "Project Assistant, Online Self Assessment",
+		subtitle: "TU Wien",
+	},
+	{
+		date: "2020 – 2023",
+		category: "career",
+		text: "Student Assistant for Research and Administration, Online Self Assessment",
+		subtitle: "TU Wien",
 	},
 	{
 		date: "2019 – 2020",
 		category: "career",
-		kind: "Career",
-		text: "Scientific employee for digitization, Wiener Linien",
+		text: "Scientific Employee for Digitization",
+		subtitle: "Wiener Linien",
 	},
 	{
 		date: "2019 – 2023",
 		category: "education",
-		kind: "Education",
-		text: "MSc Media and Human-Centered Computing, TU Wien",
+		text: "MSc Media and Human-Centered Computing",
+		subtitle: "TU Wien · passed with distinction",
 	},
 	{
 		date: "2017 – 2020",
 		category: "career",
-		kind: "Career",
-		text: "Tutor, Interface and Interaction Design, TU Wien",
+		text: "Tutor, Interface and Interaction Design",
+		subtitle: "TU Wien",
 	},
 	{
 		date: "2013 – 2019",
 		category: "education",
-		kind: "Education",
-		text: "BSc Media Informatics and Visual Computing, TU Wien",
+		text: "BSc Media Informatics and Visual Computing",
+		subtitle: "TU Wien",
 	},
 	{
 		date: "2012 – 2024",
 		category: "personal",
-		kind: "Personal",
 		text: "Agriculture and Farming, Pamhagen",
 		subtitle: "Certificates: Agriculture · Viticulture and wine production",
 	},
