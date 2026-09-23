@@ -57,11 +57,11 @@ export const projects: Project[] = [
 		id: "condignum",
 		title: "Security Management Platform",
 		subtitle:
-			"Frontend for a cybersecurity SaaS platform — visualization, modernization, design consistency",
+			"Frontend for a cybersecurity SaaS platform — development, modernization, design consistency",
 		org: "condignum GmbH — Frontend developer",
 		period: "2024 – current",
 		summary:
-			"React frontend work on a cybersecurity SaaS platform: customer features that arrive as product-owner prototypes, and the visualization layer that has to make security data readable. Alongside the feature work I modernize libraries and legacy code and push the platform towards consistent design patterns and a better developer experience.",
+			"A React frontend for a cybersecurity SaaS platform that allows users to manage their security data and organize critical information. Here I build customer-facing features, that either arrive as high-fidelity product-owner prototypes or are implemented from scratch based on customer requirements. Alongside the feature work I modernize libraries and legacy code and push the platform towards consistent design patterns and a better developer experience.  Recently, my team also integrated AI to improve time-to-market, as well as the overall development workflow.",
 		tags: [
 			"React",
 			"information visualization",
@@ -71,18 +71,18 @@ export const projects: Project[] = [
 		],
 		details: {
 			context:
-				"The platform has grown with the product: many interconnected views over the same underlying security data, built by a small team. Features reach the frontend as prototypes from the product owners, which leaves the question of how they fit the rest of the platform — visually, structurally, and in terms of what they do to the views around them — to be answered during implementation.",
+				"The platform has grown rapidly over the years. It consists of many interconnected views, built by a small team. Feature requests reach the development team from the product owners, which leaves the question of how they fit the rest of the platform — visually, structurally, and in terms of how they interact with existing components.",
 			contribution: [
-				"Develop customer-facing features as a React developer in the DevOps team, taking product-owner prototypes to production frontend.",
-				"Analysed information visualization libraries against the platform's needs — what each one can express, where it stops, and what it costs to adopt and maintain — as the basis for how security data is presented.",
-				"Work on complex, interconnected features: trace how a change propagates through shared state and neighbouring views first, so side effects surface in the design rather than in production.",
-				"Modernize the platform by updating libraries and reworking legacy code, keeping the upgrade path incremental so feature delivery continues alongside it.",
-				"Watch over design consistency across the platform and integrate new design patterns where the same UI problem was being solved twice.",
+				"Develop customer-facing features as a React developer in the DevOps team.",
+				"Analysed information visualization libraries against the platform's needs to support the presentation of security data in dashboards.",
+				"Work on complex, interconnected features: trace how a change propagates through other views, so side effects surface in the design rather than in production.",
+				"Modernize the platform by updating libraries and reworking legacy code, as well as enhancing the DevOps workflow",
+				"Integrating AI into the prototyping and development workflow",
+				"Watch over design consistency across the platform and integrate new design patterns where similar UI/UX problems were being solved multiple times.",
 				"Analyse the existing platform for UI/UX and developer-experience improvements and turn the findings into concrete changes.",
 			],
-			outcome:
-				"Dependencies and legacy areas are brought up to date step by step without pausing feature delivery, and recurring interactions are increasingly covered by shared patterns instead of one-off solutions — which keeps the interface consistent for customers and the codebase faster to work in for the team.",
-			techStack: ["React", "TypeScript"],
+			outcome: "Modernization of the platform tech stack, integration of AI in the development workflow, and improved deployment workflows.",
+			techStack: ["React", "JavaScript", "TypeScript", "D3.js", "REST API", "GitHub Actions", "Docker", "Vite", "Vitest"],
 			links: [],
 			note: "The platform is a commercial product — screenshots, customer details and metrics are not public.",
 		},
@@ -95,17 +95,17 @@ export const projects: Project[] = [
 		org: "TU Wien — Master's thesis",
 		period: "2021 – 2023",
 		summary:
-			"A Miro application and user study exploring how the infinite canvas can host collaborative, data-driven interactive articles, with GloVe word embeddings clustering participants' contributions by semantic similarity live on the board. Awarded Different Brilliant at the IConCMT 2023 conference.",
+			"A Miro application and user study exploring how the infinite canvas can host collaborative, data-driven interactive articles, with GloVe word embeddings clustering participants' contributions by semantic similarity. This project was my Master's thesis and has been awarded the Different Brilliant at the IConCMT 2023 conference.",
 		tags: [
 			"HCI research",
-			"information visualization",
+			"Information visualization",
 			"React",
 			"D3.js",
-			"word embeddings",
+			"Semantic similarity",
 		],
 		details: {
 			context:
-				"Interactive articles turn passive reading into active exploration, but their design vocabulary was built for flat, scrolling pages. The infinite canvas — the open, spatial environment of tools like Miro and Figma — had never been examined as a medium for interactive, data-driven content, even as collaborative knowledge work moved onto exactly those canvases.",
+				"Interactive articles (sometimes also referred to as explorable explanations) turn passive reading into interactive exploration, but their design vocabulary was built for flat, scrolling pages. The infinite canvas (e.g., Miro and Figma) provides an open, spatial environment that has never been examined as a medium for interactive, data-driven content. These tools often also support collaborative ideation which allows to design truly engaging experiences for ideation. By using ideas based on Gamestorming (https://www.gamestorming.com/) we were able to adapt analog techniques for those canvases.",
 			contribution: [
 				"Followed a design study methodology (Sedlmair et al.): literature review, canvas exploration, prototype design, user study, refined concept.",
 				"Analysed the Miro board as a visual analytics system: board items are data entities, their spatial relationships encode meaning, and SDK panels provide bi-directional data flow to D3 visualizations.",
@@ -114,13 +114,14 @@ export const projects: Project[] = [
 				"Designed a refined prototype around Gamestorming: participants annotate shared images, and GloVe word vectors cluster them by semantic similarity directly on the board.",
 			],
 			outcome:
-				"The thesis received the Different Brilliant award at IConCMT 2023. Key findings: shared and individual artifacts need fundamentally different spatial strategies; facilitator and participant roles must be supported separately in the interface; Gestalt principles are what make an open canvas readable; and axis labels measurably shape how participants answer. All of this rests on the model below, which frames the Miro board itself as a visual analytics system: board items are the data, modal and panel are the views, and the SDK carries data in both directions.",
+				"The thesis received the Different Brilliant award at IConCMT 2023. Key findings: shared and individual artifacts need fundamentally different spatial strategies; Gestalt principles give an open canvas structure and make the content universally readable; the infinite canvas provides a unique knowledge database with visual entities as data points. All of this rests on the diagram below, which frames the Miro board itself as a visual analytics system: board items are the data, modal and panel are the views, and the SDK carries data in both directions.",
 			researchStack: [
 				"Design study methodology (Sedlmair et al.)",
 				"Thinking-aloud study",
 				"Semi-structured interviews",
+				"Semantic similarity analysis (GloVe word embeddings)",
 			],
-			designStack: ["Gamestorming", "Canvas prototyping (Miro)"],
+			designStack: ["Gamestorming", "Canvas prototyping (Miro)", "Figma", "Information visualization design (D3.js)"],
 			techStack: [
 				"Miro Web SDK",
 				"Miro REST API",
