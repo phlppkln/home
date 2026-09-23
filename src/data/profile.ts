@@ -1,11 +1,11 @@
 export const profile = {
 	name: "Philipp Klein",
-	role: "HCI & Design Engineer",
-	focus: ["Human-AI Interaction", "Information Visualization", "Human-Centered Design"],
+	role: "HCI, Design & Frontend Engineer",
+	focus: ["Human-Computer Interaction", "Frontend Engineering", "Information Visualization", "UI/UX Design"],
 	about: [
-		"My work sits at the intersection of human-computer interaction and frontend engineering: researching how people understand and engage with interactive systems, then building the interfaces that put those ideas in front of them. I've applied this to interactive articles and digital learning environments, focusing on how to present complex information and heighten understanding and engagement. That's what pulled me into HCI, and from there into information visualization and interactive data exploration. Increasingly digital systems incorporate models in their interfaces, so recently I'm especially interested in the intersection of AI and HCI. In my master's thesis I used word embeddings to cluster contributions on an infinite canvas — though the question driving my curiosity was never whether the output looked impressive, but whether it measurably helped someone understand something.",
-		"Today I build interfaces at condignum in Vienna, on a cybersecurity SaaS platform. Before that I built a web-based Online Self Assessment for prospective informatics students at TU Wien — the same university where I finished my Master's in Media and Human-Centered Computing.",
-		"Away from the screen, chances are I'm out on a bike or somewhere underneath one, working my way through the 50.000th competing idea of what counts as a bike standard.",
+		"Hi there, I'm Philipp. Over the years I've gone from building interactive systems that help people learn and self-reflect while making decisions at TU Wien, to data-driven SaaS platforms that make the connections between interlinked objects understandable. Today I'm a Frontend Developer at condignum, a cybersecurity company in Vienna.",
+		"I completed my Master's in Media and Human-Centered Computing at TU Wien, where my thesis about collaborative interactive articles on an infinite canvas won the Different Brilliant award at IConCMT 2023. My studies focused on building web-based experiences that let people use systems for knowledge creation and insight generation. My work sits in the overlapping areas of human-computer interaction, information visualization, UI/UX design and frontend development.",
+		"Besides technology, I enjoy grabbing my camera and exploring the less-traveled paths on my bike, or tinkering on the rest of my bike fleet. I also hold diplomas in agriculture and viticulture, from working as a farmer alongside my education.",
 	],
 	contact: [
 		{
