@@ -10,9 +10,12 @@
  *   `compact`  0 at the top of the page → 1 once the hero has collapsed.
  *              Interpolates the whole composition from the tall hero mark
  *              into a low ridge that stays pinned under the topbar.
- *   `progress` 0 → 1 across the scrollable length of the document, and
+ *   `progress` 0 → 1 from the top of the page to where the drop zone
+ *              (an empty box after the last section) comes into view, and
  *              drives the rider along the ridge. Reaching the clay disc on
- *              the right means the end of the page has been reached.
+ *              the right means the end of the content has been reached;
+ *              scrolling on into the drop zone sends the rider over the
+ *              edge of the ridge.
  *
  * Language: a tapering field of hairline reeds, two concentric circles and
  * an open arc, one clay disc as the focal point, all resting on a single
@@ -32,6 +35,8 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 const props = defineProps<{
 	sections: { id: string; label: string }[];
 	active: string;
+	/** Id of the empty box after the last section the rider falls into. */
+	drop: string;
 }>();
 const emit = defineEmits<{ pinned: [value: boolean] }>();
 
@@ -51,14 +56,23 @@ const REED_COUNT = 72;
  * opaque, so that is the least room that keeps the rider whole at the
  * summit; under the baseline sits the current sector's bar (see below).
  */
-const HERO = { viewH: 212, baseY: 178, fieldX1: 430, amp: 1, discX: 524, rider: 1 };
-const RIDGE = { viewH: 59, baseY: 43, fieldX1: 566, amp: 0.18, discX: 600, rider: 0.64 };
+const HERO = { viewH: 212, baseY: 178, fieldX1: 430, amp: 1, discX: 524, rider: 1.15 };
+const RIDGE = { viewH: 61, baseY: 45, fieldX1: 566, amp: 0.18, discX: 600, rider: 0.74 };
 
 /** Scroll distance over which the hero pose collapses into the ridge. */
 const COLLAPSE_PX = 220;
 
 const compact = ref(0);
 const progress = ref(0);
+/**
+ * Over an edge: off the right end once the drop zone is well into view,
+ * off the left end on arriving back at the top of the page by scrolling
+ * up. A fresh load at the top leaves the rider standing — only riding
+ * back into the start sends it over.
+ */
+const fallen = ref<"" | "start" | "end">("");
+/** Last scroll direction, so the rider faces the way the page is moving. */
+const backwards = ref(false);
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
@@ -153,7 +167,7 @@ const riderScale = computed(() => {
 	const pose = lerp(HERO.rider, RIDGE.rider, compact.value);
 	if (!rendered.value) return pose;
 	const natural = (RIDER_H * rendered.value) / VIEW_W;
-	const floor = lerp(18, 13, compact.value);
+	const floor = lerp(21, 15, compact.value);
 	return clamp(Math.max(pose * natural, floor) / natural, RIDGE.rider, 1.8);
 });
 
@@ -167,12 +181,17 @@ const rider = computed(() => {
 	// the highest-frequency wiggle in the terrain for free.
 	const y = (rear + front) / 2;
 	const tilt = clamp((Math.atan2(front - rear, base) * 180) / Math.PI, -34, 34);
+	// Riding back up the page the rider turns round. The drawing is
+	// mirrored about its own centre, so it stays on both contact points.
+	const flip = backwards.value ? -1 : 1;
+	// Wheels turn with distance travelled, not with time; mirrored, the
+	// same angle would read as spinning the wrong way, so it flips too.
+	const spin = ((x - FIELD_X0) * 360) / (2 * Math.PI * WHEEL_R * scale);
 
 	return {
 		x,
-		transform: `translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${tilt.toFixed(2)}) scale(${scale.toFixed(3)})`,
-		// Wheels turn with distance travelled, not with time
-		spin: ((x - FIELD_X0) * 360) / (2 * Math.PI * WHEEL_R * scale),
+		transform: `translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${tilt.toFixed(2)}) scale(${(flip * scale).toFixed(3)} ${scale.toFixed(3)})`,
+		spin: flip * spin,
 	};
 });
 
@@ -201,6 +220,32 @@ const ranges = ref<Range[]>([]);
 let measuredAt = 0;
 
 /**
+ * Scroll position at which the ride ends — the drop zone's top reaching
+ * the bottom of the viewport — and the one past which the rider has gone
+ * over the edge. Without a drop zone the ride spans the whole document
+ * and nobody falls.
+ */
+let rideEnd = 0;
+let fallAt = Infinity;
+
+function measureDrop() {
+	const max = document.documentElement.scrollHeight - window.innerHeight;
+	const el = document.getElementById(props.drop);
+	rideEnd = max;
+	fallAt = Infinity;
+	if (!el) return;
+
+	const rect = el.getBoundingClientRect();
+	const top = rect.top + window.scrollY;
+	const end = top - window.innerHeight;
+	if (end > 4) {
+		rideEnd = Math.min(end, max);
+		// Over once half the box is showing, capped by what can be scrolled
+		fallAt = Math.min(rideEnd + rect.height * 0.5, max - 2);
+	}
+}
+
+/**
  * A section is "current" while it crosses the middle of the viewport
  * (useActiveSection), so its stretch of the ridge runs from the scroll
  * position where its top reaches the centre line to where its bottom
@@ -208,7 +253,7 @@ let measuredAt = 0;
  * intro before the first one is the neutral run-up, unlabelled.
  */
 function measureSections() {
-	const max = document.documentElement.scrollHeight - window.innerHeight;
+	const max = rideEnd;
 	if (max <= 4) {
 		ranges.value = [];
 		return;
@@ -280,22 +325,30 @@ const outerArc = arcPath(90, 298, 46);
 
 const svg = ref<SVGSVGElement | null>(null);
 let frame = 0;
+let lastY = 0;
 let observer: ResizeObserver | undefined;
 
 function measure() {
 	frame = 0;
 	const height = document.documentElement.scrollHeight;
-	const max = height - window.innerHeight;
 	const y = window.scrollY;
-
-	progress.value = max > 4 ? clamp(y / max, 0, 1) : 0;
-	compact.value = smooth(clamp(y / COLLAPSE_PX, 0, 1));
 
 	// Sections move when the page grows (a project card opening, say)
 	if (height !== measuredAt) {
 		measuredAt = height;
+		measureDrop();
 		measureSections();
 	}
+
+	// A few pixels of slack, so a trackpad settling doesn't spin the rider
+	if (Math.abs(y - lastY) > 3) {
+		backwards.value = y < lastY;
+		lastY = y;
+	}
+
+	progress.value = rideEnd > 4 ? clamp(y / rideEnd, 0, 1) : 0;
+	compact.value = smooth(clamp(y / COLLAPSE_PX, 0, 1));
+	fallen.value = y >= fallAt ? "end" : y <= 2 && backwards.value ? "start" : "";
 }
 
 function onScroll() {
@@ -309,6 +362,7 @@ function onResize() {
 }
 
 onMounted(() => {
+	lastY = window.scrollY;
 	measure();
 	window.addEventListener("scroll", onScroll, { passive: true });
 	window.addEventListener("resize", onResize, { passive: true });
@@ -446,31 +500,38 @@ onBeforeUnmount(() => {
 				<!-- The single warm note in the whole page -->
 				<circle class="disc" :cx="discX" :cy="baseY" r="5" />
 
-				<g class="rider" :transform="rider.transform">
-					<g class="bike">
-						<path
-							class="frame"
-							d="M -5.6 -4.2 L -0.4 -3.6 L -4 -11 Z
-							   M -0.4 -3.6 L 4.6 -10.2 L -4 -11
-							   M 4.6 -10.2 L 5.6 -4.2"
-						/>
-						<g class="wheel" :transform="`translate(-5.6 -4.2) rotate(${rider.spin})`">
-							<circle :r="WHEEL_R" />
-							<line class="spoke" :x1="-WHEEL_R" y1="0" :x2="WHEEL_R" y2="0" />
-							<line class="spoke" x1="0" :y1="-WHEEL_R" x2="0" :y2="WHEEL_R" />
+				<!--
+					The drop sits outside the rider's own transform, so the fall is
+					in plain view units: off the end of the ridge and down past the
+					band, whichever way the rider was facing.
+				-->
+				<g class="drop" :class="{ 'is-fallen': fallen, 'is-start': fallen === 'start' }">
+					<g class="rider" :transform="rider.transform">
+						<g class="bike">
+							<path
+								class="frame"
+								d="M -5.6 -4.2 L -0.4 -3.6 L -4 -11 Z
+								   M -0.4 -3.6 L 4.6 -10.2 L -4 -11
+								   M 4.6 -10.2 L 5.6 -4.2"
+							/>
+							<g class="wheel" :transform="`translate(-5.6 -4.2) rotate(${rider.spin})`">
+								<circle :r="WHEEL_R" />
+								<line class="spoke" :x1="-WHEEL_R" y1="0" :x2="WHEEL_R" y2="0" />
+								<line class="spoke" x1="0" :y1="-WHEEL_R" x2="0" :y2="WHEEL_R" />
+							</g>
+							<g class="wheel" :transform="`translate(5.6 -4.2) rotate(${rider.spin})`">
+								<circle :r="WHEEL_R" />
+								<line class="spoke" :x1="-WHEEL_R" y1="0" :x2="WHEEL_R" y2="0" />
+								<line class="spoke" x1="0" :y1="-WHEEL_R" x2="0" :y2="WHEEL_R" />
+							</g>
 						</g>
-						<g class="wheel" :transform="`translate(5.6 -4.2) rotate(${rider.spin})`">
-							<circle :r="WHEEL_R" />
-							<line class="spoke" :x1="-WHEEL_R" y1="0" :x2="WHEEL_R" y2="0" />
-							<line class="spoke" x1="0" :y1="-WHEEL_R" x2="0" :y2="WHEEL_R" />
+						<g class="body">
+							<path class="limb" d="M -3.4 -12.6 L 1.2 -9.6 L -0.4 -4.6" />
+							<path class="torso" d="M -3.4 -12.6 L 0.4 -18" />
+							<path class="limb" d="M 0.4 -18 L 4.6 -10.2" />
+							<circle class="head" cx="2" cy="-20.4" r="2.2" />
 						</g>
-					</g>
-					<g class="body">
-						<path class="limb" d="M -3.4 -12.6 L 1.2 -9.6 L -0.4 -4.6" />
-						<path class="torso" d="M -3.4 -12.6 L 0.4 -18" />
-						<path class="limb" d="M 0.4 -18 L 4.6 -10.2" />
-						<circle class="head" cx="2" cy="-20.4" r="2.2" />
-					</g>
+				</g>
 				</g>
 			</svg>
 
@@ -720,6 +781,47 @@ onBeforeUnmount(() => {
 }
 
 /* ── Rider ─────────────────────────────────────────────────────── */
+
+/*
+ * The fall. Rolling on past the disc to where the baseline runs out, a
+ * beat of nothing underneath, then gravity: accelerating down and
+ * pitching forward as it drops out of the band and fades. Off the start
+ * the same fall plays mirrored, since the rider is facing left there.
+ *
+ * Coming back is not the fall in reverse — floating up out of the page
+ * would read as wrong — so the rider snaps home while invisible and
+ * simply fades back in on the ridge.
+ */
+.drop {
+	--dir: 1;
+	transform-box: fill-box;
+	transform-origin: 50% 100%;
+	transition: opacity 360ms var(--ease);
+}
+
+.drop.is-start {
+	--dir: -1;
+}
+
+.drop.is-fallen {
+	opacity: 0;
+	animation: fall 900ms both;
+	transition: opacity 260ms var(--ease) 640ms;
+}
+
+@keyframes fall {
+	0% {
+		transform: none;
+		animation-timing-function: cubic-bezier(0.3, 0, 0.4, 1);
+	}
+	35% {
+		transform: translate(calc(17px * var(--dir)), 0);
+		animation-timing-function: cubic-bezier(0.5, 0, 0.9, 0.5);
+	}
+	100% {
+		transform: translate(calc(30px * var(--dir)), 90px) rotate(calc(70deg * var(--dir)));
+	}
+}
 
 .rider {
 	animation: fade-in 700ms var(--ease) 1100ms both;
