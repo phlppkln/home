@@ -9,6 +9,7 @@ import AboutSection from "./components/AboutSection.vue";
 import SkillsSection from "./components/SkillsSection.vue";
 import TimelineSection from "./components/TimelineSection.vue";
 import ProjectsSection from "./components/ProjectsSection.vue";
+import ContactLinks from "./components/ContactLinks.vue";
 
 const { active } = useActiveSection(["intro", "about", "skills", "timeline", "projects"]);
 
@@ -106,8 +107,11 @@ const year = new Date().getFullYear();
 
 	<footer>
 		<div class="footer-inner">
-			<span class="footer-name">{{ profile.name }}</span>
-			<span>{{ year }}</span>
+			<span>
+				<span class="footer-name">{{ profile.name }}</span>
+				· {{ year }}
+			</span>
+			<ContactLinks class="footer-contact" />
 		</div>
 	</footer>
 </template>
@@ -258,7 +262,7 @@ footer {
 
 .footer-inner {
 	display: flex;
-	align-items: baseline;
+	align-items: center;
 	justify-content: space-between;
 	flex-wrap: wrap;
 	gap: 0.5rem 1.5rem;
@@ -272,6 +276,11 @@ footer {
 .footer-name {
 	font-family: var(--font-heading);
 	color: var(--muted);
+}
+
+/* Pulls the last icon's hit area out so its glyph lines up with the edge */
+.footer-contact {
+	margin-right: -0.5rem;
 }
 
 /*
