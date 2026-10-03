@@ -100,7 +100,7 @@ const year = new Date().getFullYear();
 		<HeroMark
 			:sections="sections"
 			:active="active"
-			drop="drop"
+			drop="footer"
 			@pinned="pinned = $event"
 		/>
 		<IntroSection />
@@ -108,11 +108,10 @@ const year = new Date().getFullYear();
 		<SkillsSection />
 		<TimelineSection />
 		<ProjectsSection />
-		<!-- Deliberately empty: the rider rides off the ridge into it (see HeroMark) -->
-		<div id="drop" class="drop-zone" aria-hidden="true"></div>
 	</main>
 
-	<footer>
+	<!-- The rider rides off the ridge as this scrolls into view (see HeroMark) -->
+	<footer id="footer">
 		<div class="footer-inner">
 			<span>
 				<span class="footer-name">{{ profile.name }}</span>
@@ -262,15 +261,6 @@ main {
 	padding: 0 var(--page-padding);
 }
 
-/*
- * The empty stretch past the last section the rider falls into. Framed by
- * the projects' hairline above and the footer's below, it reads as a
- * quiet box rather than a missing section.
- */
-.drop-zone {
-	height: 11rem;
-}
-
 footer {
 	border-top: 1px solid var(--line);
 }
@@ -329,8 +319,7 @@ footer {
 
 @media print {
 	.topbar,
-	.skip-link,
-	.drop-zone {
+	.skip-link {
 		display: none;
 	}
 }

@@ -11,7 +11,7 @@
  *              Interpolates the whole composition from the tall hero mark
  *              into a low ridge that stays pinned under the topbar.
  *   `progress` 0 → 1 from the top of the page to where the drop zone
- *              (an empty box after the last section) comes into view, and
+ *              (the footer) comes into view, and
  *              drives the rider along the ridge. Reaching the clay disc on
  *              the right means the end of the content has been reached;
  *              scrolling on into the drop zone sends the rider over the
@@ -35,7 +35,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 const props = defineProps<{
 	sections: { id: string; label: string }[];
 	active: string;
-	/** Id of the empty box after the last section the rider falls into. */
+	/** Id of the element after the last section; the rider falls once it is half in view. */
 	drop: string;
 }>();
 const emit = defineEmits<{ pinned: [value: boolean] }>();

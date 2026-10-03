@@ -60,7 +60,7 @@ export const projects: Project[] = [
 		org: "TU Wien",
 		period: "2020 – 2024",
 		summary:
-			"An interactive self-assessment that lets prospective students experience topics of an informatics study programme before committing to it. I took it from the first proof of concept to a platform that became a mandatory part of TU Wien's informatics admission process, with over 1,600 registrations in its first official release.",
+			"An interactive self-assessment that lets prospective students experience topics of an informatics study program before committing to it. I took it from the first proof of concept to a platform that became a mandatory part of TU Wien's informatics admission process, with 1,600+ participants in its first official release.",
 		tags: [
 			"e-learning",
 			"design thinking",
@@ -70,7 +70,7 @@ export const projects: Project[] = [
 		],
 		details: {
 			context:
-				"Prospective students often choose study programmes from brochures and open days, then drop out when reality doesn't match expectations. TU Wien was in the process of introducing a more flexible solution but early prototypes with Moodle proved to be too rigid following constructivistic learning theory. To fully utilize the potential of this approach for self-reflection, we built a custom platform using Vue.js and Strapi.",
+				"Prospective students often choose study programs from brochures and open days, then drop out when reality doesn't match expectations. TU Wien was in the process of introducing a more flexible solution. Early Moodle prototypes proved too rigid for a constructivist, exploration-based approach, so we built a custom platform with Vue.js and Strapi.",
 			contribution: [
 				"Built the proof of concept and the production platform: Vue.js frontend, Strapi headless CMS as a REST API connected to a MariaDB database.",
 				"Followed the Design Thinking process (literature review, proof of concept, expert interviews, full prototype, user study, iterations) to guide the development.",
@@ -113,9 +113,9 @@ export const projects: Project[] = [
 		subtitle:
 			"Frontend for a cybersecurity SaaS platform — development, modernization, design consistency",
 		org: "condignum GmbH — Frontend developer",
-		period: "2024 - current",
+		period: "2024 – present",
 		summary:
-			"A React frontend for a cybersecurity SaaS platform to manage security data and organize critical information. Here I build customer-facing features, either from high-fidelity product-owner prototypes or implement them from scratch based on customer requirements. Alongside the feature work I modernize libraries and legacy code and maintain consistent design patterns and a better developer experience. Recently, my tasks also revolved around the integration of AI to improve developer experience and by integrating codebase-backed design into prototyping workflows.",
+			"React frontend for a cybersecurity SaaS platform that helps organizations manage security data. I build customer-facing features, modernize legacy code and libraries, keep design patterns consistent, and integrate AI into our prototyping and development workflow.",
 		tags: [
 			"React",
 			"design patterns",
@@ -129,12 +129,12 @@ export const projects: Project[] = [
 				"The platform has grown rapidly over the years. It consists of many interconnected views, built by a small team. Feature requests reach the development team from the product owners, which leaves the question of how they fit the rest of the platform — visually, structurally, and in terms of how they interact with existing components.",
 			contribution: [
 				"Develop customer-facing features as a React developer in the DevOps team.",
-				"Analysed information visualization libraries against the platform's needs to support the presentation of security data in dashboards.",
+				"Analyze information visualization libraries against the platform's needs to support the presentation of security data in dashboards.",
 				"Work on complex, interconnected features: trace how a change propagates through other views, so side effects surface in the design rather than in production.",
-				"Modernize the platform by updating libraries and reworking legacy code, as well as enhancing the DevOps workflow",
-				"Integrating AI into the prototyping and development workflow",
+				"Modernize the platform by updating libraries and reworking legacy code, and improve the DevOps workflow.",
+				"Integrate AI into the prototyping and development workflow.",
 				"Watch over design consistency across the platform and integrate new design patterns where similar UI/UX problems were being solved multiple times.",
-				"Analyse the existing platform for UI/UX and developer-experience improvements and turn the findings into concrete changes.",
+				"Analyze the existing platform for UI/UX and developer-experience improvements and turn the findings into concrete changes.",
 			],
 			outcome: "Modernization of the platform tech stack, integration of AI in the development workflow, and improved deployment workflows.",
 			techStack: ["React", "JavaScript", "TypeScript", "D3.js", "REST API", "GitHub Actions", "Docker", "Vite", "Vitest"],
@@ -150,7 +150,7 @@ export const projects: Project[] = [
 		org: "TU Wien — Master's thesis",
 		period: "2021 – 2023",
 		summary:
-			"A Miro application and user study exploring how the infinite canvas can host collaborative, data-driven interactive articles, with GloVe word embeddings clustering participants' contributions by semantic similarity. This project was my Master's thesis and has been awarded the Different Brilliant at the IConCMT 2023 conference.",
+			"A Miro application and user study exploring how the infinite canvas can host collaborative, data-driven interactive articles, with GloVe word embeddings clustering participants' contributions by semantic similarity. This project was my Master's thesis and was awarded the Different Brilliant award at the IConCMT 2023 conference.",
 		tags: [
 			"HCI research",
 			"Information visualization",
@@ -160,16 +160,16 @@ export const projects: Project[] = [
 		],
 		details: {
 			context:
-				"Interactive articles (also referred to as explorable explanations) turn passive reading into interactive exploration, but their design vocabulary was built for flat, scrolling pages. The infinite canvas (e.g., Miro and Figma) provides an open, spatial environment that has never been examined as a medium for interactive, data-driven content. These tools often also support collaborative ideation which allow to design truly engaging experiences for ideation. By using ideas based on Gamestorming (https://www.gamestorming.com/) we were able to adapt analog techniques for those canvases.",
+				"Interactive articles (also referred to as explorable explanations) turn passive reading into interactive exploration, but their design vocabulary was built for flat, scrolling pages. The infinite canvas (e.g., Miro and Figma) provides an open, spatial environment that had barely been examined as a medium for interactive, data-driven content. These tools often also support collaborative ideation, which makes it possible to design truly engaging experiences for ideation. By using ideas based on Gamestorming we were able to adapt analog techniques for those canvases.",
 			contribution: [
 				"Followed a design study methodology (Sedlmair et al.): literature review, canvas exploration, prototype design, user study, refined concept.",
-				"Analysed the Miro board as a visual analytics system: board items are data entities, their spatial relationships encode meaning, and panels provide bi-directional data flow to D3 visualizations.",
+				"Analyzed the Miro board as a visual analytics system: board items are data entities, their spatial relationships encode meaning, and panels provide bi-directional data flow to D3 visualizations.",
 				"Built Dig Deeper (Miro REST API, Miro Web SDK, React, D3.js): facilitators create input planes, respondents answer by placing sticky notes, and positions are aggregated into an interactive heatmap.",
 				"Ran a thinking-aloud study with semi-structured interviews, eight participants split across facilitator and respondent roles.",
 				"Designed a refined prototype around Gamestorming: participants annotate shared images, and GloVe word vectors cluster them by semantic similarity directly on the board.",
 			],
 			outcome:
-				"The thesis received the Different Brilliant award at IConCMT 2023. Key findings: shared and individual artifacts need fundamentally different spatial strategies; Gestalt principles give an open canvas structure and make the content universally readable; the infinite canvas provides a unique knowledge database with visual entities as data points. The diagram below shows how the Miro board itself acts as a visual analytics system: board items are the data, modal and panel are the views, and the Miro API and SDK carries data in both directions.",
+				"The thesis received the Different Brilliant award at IConCMT 2023. Key findings: shared and individual artifacts need fundamentally different spatial strategies; Gestalt principles give an open canvas structure and make the content universally readable; the infinite canvas provides a unique knowledge database with visual entities as data points.",
 			researchStack: [
 				"Design study methodology (Sedlmair et al.)",
 				"Thinking-aloud study",
@@ -190,6 +190,8 @@ export const projects: Project[] = [
 				{
 					src: "img/projects/reimagining-design/miro_va_system_updated.jpg",
 					alt: "Diagram of the Miro board read as a visual analytics system: board items with entities, relationships and metadata exchange data with a modal and a side panel that host D3 visualizations supporting analyze, present, explore, interact and export.",
+					caption:
+						"The Miro board as a visual analytics system: board items are the data, modal and panel are the views, and the Miro API and SDK carry data in both directions.",
 					width: 1174,
 					height: 851,
 					after: "outcome",
@@ -203,6 +205,10 @@ export const projects: Project[] = [
 				{
 					label: "GitHub — dig-deeper-v1",
 					href: "https://github.com/phlppkln/dig-deeper-v1",
+				},
+				{
+					label: "Gamestorming",
+					href: "https://www.gamestorming.com/",
 				},
 				{
 					label: "IConCMT 2023",
